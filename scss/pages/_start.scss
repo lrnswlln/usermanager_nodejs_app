@@ -1,0 +1,32 @@
+.container-background {
+  background-image: url("../media/daniel-leone-v7daTKlZzaw-unsplash.jpg"); //Quelle: https://unsplash.com/de/fotos/silhouette-von-bergen-in-der-nachtfotografie-v7daTKlZzaw
+  background-size: cover;
+  background-attachment: fixed;
+  overflow: hidden;
+
+  .btn-sparkle {
+    background-image: url("../media/U3qYN8S0j3bpK.webp") !important; // Quelle:  https://giphy.com/gifs/stars-U3qYN8S0j3bpK
+    background-size: cover;
+    --box-shadow-color: black;
+    box-shadow: 0 0 30px var(--box-shadow-color);
+  }
+
+  .btn-primary.btn-sparkle {
+    --box-shadow-color: #007bff;
+  }
+
+  h1 {
+    font-size: 70px;
+  }
+
+  .form-floating, .table {
+    opacity: 0.7;
+  }
+
+}
+
+@include media-breakpoint-down(md) {
+  .btn-primary.btn-sparkle {
+    width: 100%;
+  }
+}

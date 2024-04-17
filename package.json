@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "test": "npx prettier --write scss/",
+    "watch": "watch 'npm run css' ./scss",
+    "build": "npm-run-all copy:bootstrap css:compile",
+    "copy:bootstrap": "cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.* assets/js/",
+    "copy:bootstrap-icon": "cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.* assets/fonts/",
+    "css:compile": "sass --load-path=node_modules --style=compressed --embed-source-map ./scss/main.scss ./assets/css/main.css",
+    "css:prefix": "postcss --replace assets/css/main.css --use autoprefixer --map",
+    "css": "npm-run-all css:compile css:prefix"
+  },
+  "devDependencies": {
+    "bootstrap": "^5.3.2",
+    "bootstrap-icons": "^1.11.1",
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.69.5",
+    "watch": "^0.13.0"
+  },
+  "dependencies": {
+    "@types/bootstrap": "^5.2.10",
+    "bootstrap-icons": "^1.11.1"
+  }
+}

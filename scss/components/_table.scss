@@ -1,0 +1,50 @@
+table {
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  table-layout: fixed;
+
+  th,
+  td {
+    padding: .625em;
+    text-align: center;
+  }
+
+  th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  @media screen and (max-width: 767px) {
+
+    thead {
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+
+    tr {
+      display: block;
+      margin-bottom: .625em;
+    }
+
+    td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: .8em;
+      text-align: right;
+
+      &::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
