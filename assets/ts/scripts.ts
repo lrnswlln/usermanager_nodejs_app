@@ -15,7 +15,6 @@ document.querySelector("#formCreate").addEventListener("submit", (event) => {
     addUser();
 });
 
-
 function generateRandomUser() {
     const firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia"];
     const lastNames = ["Smith", "Johnson", "Brown", "Williams", "Jones", "Garcia"];
@@ -133,9 +132,26 @@ async function renderUserList() {
                 deleteButton.className = "btn btn-danger m-3 bi bi-trash";
                 deleteButton.addEventListener("click", () => deleteUserCloud(user.id));
                 actionsCell.appendChild(deleteButton);
+
+                renderUserPet(user.id);
+
+
             });
         }
 
+}
+
+async function renderUserPet(id: number) {
+    const responsePet: Response = await fetch(`https://userman.thuermer.red/api/users/${id}/pets`, {
+        credentials: "include"
+    });
+    if (responsePet?.ok) {
+        const userPet = await responsePet.json();
+
+
+
+        console.log(userPet);
+    }
 }
 
 async function editUserCloud(id: number) {

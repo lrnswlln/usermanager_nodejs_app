@@ -181,9 +181,31 @@ function renderUserList() {
                             deleteButton.className = "btn btn-danger m-3 bi bi-trash";
                             deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
                             actionsCell.appendChild(deleteButton);
+                            renderUserPet(user.id);
                         });
                     }
                     return [2 /*return*/];
+            }
+        });
+    });
+}
+function renderUserPet(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var responsePet, userPet;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id, "/pets"), {
+                        credentials: "include"
+                    })];
+                case 1:
+                    responsePet = _a.sent();
+                    if (!(responsePet === null || responsePet === void 0 ? void 0 : responsePet.ok)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, responsePet.json()];
+                case 2:
+                    userPet = _a.sent();
+                    console.log(userPet);
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
             }
         });
     });
