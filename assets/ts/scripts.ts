@@ -49,7 +49,6 @@ async function addUser() {
         passwordInput.value = "";
 
         await renderUserList();
-        scrollDown();
     } else {
         console.log("Error: Response is not OK", response.statusText);
     }
@@ -117,11 +116,16 @@ async function editUserCloud(id: number) {
         const editLastName = document.getElementById("editLastName") as HTMLInputElement;
         const editEmail = document.getElementById("editEmail") as HTMLInputElement;
 
-        await if (editFirstName && editLastName && editEmail) {
+        if (editFirstName && editLastName && editEmail) {
             // setzt Userdaten in die Inputfelder
             editFirstName.value = editUser.firstname;
             editLastName.value = editUser.lastname;
             editEmail.value = editUser.mail;
+
+            const button = document.getElementById('updateUser') as HTMLButtonElement;
+            if (button) {
+                button.setAttribute('onclick', `updateUserCloud(${id})`);
+            }
 
             // Öffnet das Bootstrap 5 Modal für die Bearbeitung
             const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
@@ -130,6 +134,51 @@ async function editUserCloud(id: number) {
 
     } else {
         console.log("Error: Response is not OK", response.statusText);
+    }
+}
+
+async function updateUserCloud(id: any) {
+
+    // Überprüft, ob ein User bearbeitet wird
+    if (id !== null) {
+        // Input Felder für Bearbeitung
+        const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
+        const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
+
+        // Trimmen der Werte
+        const editFirstName = editFirstNameInput.value.trim();
+        const editLastName = editLastNameInput.value.trim();
+
+        // Checken, ob die Eingabefelder alle gefüllt sind
+        if (editFirstName && editLastName) {
+            // Aktualisiert die Daten des ausgewählten Users
+
+            const response: Response = await fetch(`https://userman.thuermer.red/api/users/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    firstname: editFirstName,
+                    lastname: editLastName,
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            });
+
+            // Versteckt das Modal nach Bearbeitung
+            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
+            editModal.hide();
+
+
+            const button = document.getElementById('updateUser') as HTMLButtonElement;
+            if (button) {
+                button.setAttribute('onclick', `updateUser(${null})`);
+            }
+
+            await renderUserList()
+        } else {
+            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+        }
     }
 }
 

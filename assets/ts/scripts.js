@@ -85,7 +85,6 @@ function addUser() {
                     return [4 /*yield*/, renderUserList()];
                 case 2:
                     _a.sent();
-                    scrollDown();
                     return [3 /*break*/, 4];
                 case 3:
                     console.log("Error: Response is not OK", response.statusText);
@@ -148,7 +147,7 @@ function renderUserList() {
 }
 function editUserCloud(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var response, editUser, editFirstName, editLastName, editEmail, editModal;
+        var response, editUser, editFirstName, editLastName, editEmail, button, editModal;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id), {
@@ -156,7 +155,7 @@ function editUserCloud(id) {
                     })];
                 case 1:
                     response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 4];
+                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 3];
                     return [4 /*yield*/, response.json()];
                 case 2:
                     editUser = _a.sent();
@@ -164,22 +163,66 @@ function editUserCloud(id) {
                     editFirstName = document.getElementById("editFirstName");
                     editLastName = document.getElementById("editLastName");
                     editEmail = document.getElementById("editEmail");
-                    return [4 /*yield*/, ];
-                case 3:
-                    _a.sent();
                     if (editFirstName && editLastName && editEmail) {
                         // setzt Userdaten in die Inputfelder
                         editFirstName.value = editUser.firstname;
                         editLastName.value = editUser.lastname;
                         editEmail.value = editUser.mail;
+                        button = document.getElementById('updateUser');
+                        if (button) {
+                            button.setAttribute('onclick', "updateUserCloud(".concat(id, ")"));
+                        }
                         editModal = new bootstrap.Modal(document.getElementById("editModal"));
                         editModal.show();
                     }
-                    return [3 /*break*/, 5];
-                case 4:
+                    return [3 /*break*/, 4];
+                case 3:
                     console.log("Error: Response is not OK", response.statusText);
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+function updateUserCloud(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var editFirstNameInput, editLastNameInput, editFirstName, editLastName, response, editModal, button;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!(id !== null)) return [3 /*break*/, 4];
+                    editFirstNameInput = document.getElementById("editFirstName");
+                    editLastNameInput = document.getElementById("editLastName");
+                    editFirstName = editFirstNameInput.value.trim();
+                    editLastName = editLastNameInput.value.trim();
+                    if (!(editFirstName && editLastName)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id), {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                firstname: editFirstName,
+                                lastname: editLastName,
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    editModal = new bootstrap.Modal(document.getElementById("editModal"));
+                    editModal.hide();
+                    button = document.getElementById('updateUser');
+                    if (button) {
+                        button.setAttribute('onclick', "updateUser(".concat(null, ")"));
+                    }
+                    return [4 /*yield*/, renderUserList()];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
             }
         });
     });
