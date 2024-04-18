@@ -48,6 +48,54 @@ document.querySelector("#formCreate").addEventListener("submit", function (event
     event.preventDefault();
     addUser();
 });
+function generateRandomUser() {
+    var firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia"];
+    var lastNames = ["Smith", "Johnson", "Brown", "Williams", "Jones", "Garcia"];
+    var domains = ["gmail.com", "yahoo.com", "outlook.com", "example.com"];
+    var passwords = ["password123", "abc123", "qwerty", "letmein", "password"];
+    var randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    var randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    var randomDomain = domains[Math.floor(Math.random() * domains.length)];
+    var randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
+    var randomEmail = "".concat(randomFirstName.toLowerCase(), ".").concat(randomLastName.toLowerCase(), "@").concat(randomDomain);
+    return new UserObject(randomFirstName, randomLastName, randomEmail, randomPassword);
+}
+function addRandomUser() {
+    return __awaiter(this, void 0, void 0, function () {
+        var randomUser, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    randomUser = generateRandomUser();
+                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                firstname: randomUser.firstname,
+                                lastname: randomUser.lastname,
+                                mail: randomUser.mail,
+                                password: randomUser.password
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) return [3 /*break*/, 3];
+                    console.log("Random user added successfully!");
+                    return [4 /*yield*/, renderUserList()];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    console.error("Error adding random user:", response.statusText);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 function addUser() {
     return __awaiter(this, void 0, void 0, function () {
         var firstNameInput, lastNameInput, emailInput, passwordInput, firstname, lastname, mail, password, response;
@@ -106,7 +154,6 @@ function renderUserList() {
                         })];
                 case 1:
                     response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 3];
                     return [4 /*yield*/, response.json()];
                 case 2:
                     users = _a.sent();
@@ -136,11 +183,7 @@ function renderUserList() {
                             actionsCell.appendChild(deleteButton);
                         });
                     }
-                    return [3 /*break*/, 4];
-                case 3:
-                    console.log("Error: Response is not OK", response.statusText);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    return [2 /*return*/];
             }
         });
     });
@@ -226,32 +269,6 @@ function updateUserCloud(id) {
             }
         });
     });
-}
-function updateUser() {
-    console.log(userSelectIdx);
-    // Überprüft, ob ein User bearbeitet wird
-    if (userSelectIdx !== null) {
-        // Input Felder für Bearbeitung
-        var editFirstNameInput = document.getElementById("editFirstName");
-        var editLastNameInput = document.getElementById("editLastName");
-        // Trimmen der Werte
-        var editFirstName = editFirstNameInput.value.trim();
-        var editLastName = editLastNameInput.value.trim();
-        // Checken, ob die Eingabefelder alle gefüllt sind
-        if (editFirstName && editLastName) {
-            // Aktualisiert die Daten des ausgewählten Users
-            users[userSelectIdx].firstName = editFirstName;
-            users[userSelectIdx].lastName = editLastName;
-            // Versteckt das Modal nach Bearbeitung
-            var editModal = new bootstrap.Modal(document.getElementById("editModal"));
-            editModal.hide();
-            userSelectIdx = null;
-            displayUserList();
-        }
-        else {
-            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
-        }
-    }
 }
 function deleteUserCloud(id) {
     return __awaiter(this, void 0, void 0, function () {
