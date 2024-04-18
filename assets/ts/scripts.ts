@@ -56,6 +56,29 @@ async function addRandomUser() {
     }
 }
 
+async function addUserPet() {
+
+    const response = await fetch("https://userman.thuermer.red/api/users/2/pets", {
+        method: "POST",
+        body: JSON.stringify({
+            name: "Cpt Wuffer 2",
+            kind: "Ein hundi"
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include"
+    });
+
+    if (response.ok) {
+        console.log("Random user added successfully!");
+        await renderUserList();
+    } else {
+        console.error("Error adding random user:", response.statusText);
+    }
+}
+
+
 async function addUser() {
 
     const firstNameInput = document.getElementById("firstName") as HTMLInputElement;
@@ -94,18 +117,26 @@ async function addUser() {
     }
 }
 
+
+
+
+
 async function renderUserList() {
     const tableBody: HTMLTableElement | null = document.getElementById("userTableBody") as HTMLTableElement;
 
     const response: Response = await fetch("https://userman.thuermer.red/api/users", {
         credentials: "include"
     });
-    const users = await response.json();
+
+    if (response?.ok) {
+        const users = await response.json();
 
         if (tableBody) {
             tableBody.innerHTML = "";
 
-            users.forEach((user: any) => {
+            for (const user of users) {
+                const userPets = await renderUserPet(user.id);
+
                 const row = tableBody.insertRow();
 
                 const emailCell = row.insertCell(0);
@@ -120,8 +151,12 @@ async function renderUserList() {
                 firstNameCell.textContent = user.firstname;
                 firstNameCell.setAttribute("data-label", "Vorname");
 
+                const petCell = row.insertCell(3);
+                petCell.textContent = userPets.map((pet: any) => pet.name).join(", ");
+                petCell.setAttribute("data-label", "Pets");
+
                 // Füge Editier- und Lösch-Buttons hinzu
-                const actionsCell = row.insertCell(3);
+                const actionsCell = row.insertCell(4);
                 const editButton = document.createElement("button");
                 editButton.className = "btn btn-warning m-3 bi bi-pen";
                 editButton.addEventListener("click", () => editUserCloud(user.id));
@@ -133,12 +168,15 @@ async function renderUserList() {
                 deleteButton.addEventListener("click", () => deleteUserCloud(user.id));
                 actionsCell.appendChild(deleteButton);
 
-                renderUserPet(user.id);
-
-
-            });
+                const petButton = document.createElement("button");
+                petButton.className = "btn btn-primary m-3 bi bi-gitlab";
+                petButton.addEventListener("click", () => petAdmin(user.id));
+                actionsCell.appendChild(petButton);
+            }
         }
-
+    } else {
+        console.log("Error: Response is not OK", response.statusText);
+    }
 }
 
 async function renderUserPet(id: number) {
@@ -146,14 +184,61 @@ async function renderUserPet(id: number) {
         credentials: "include"
     });
     if (responsePet?.ok) {
-        const userPet = await responsePet.json();
+        const userPets = await responsePet.json();
+        return userPets;
+    }
+    return []; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
+}
 
 
 
-        console.log(userPet);
+
+function petAdmin(userId: number) {
+
+    renderUserPetList(userId);
+    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
+    const petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal") as HTMLElement);
+    petAdminModal.show();
+}
+
+async function renderUserPetList(userId: number) {
+    const tableBody: HTMLTableElement | null = document.getElementById("userPetTableBody") as HTMLTableElement;
+
+    const userPets = await renderUserPet(userId);
+
+    if (userPets) {
+
+        if (tableBody) {
+            tableBody.innerHTML = "";
+
+            for (const pet of userPets) {
+
+                const row = tableBody.insertRow();
+
+                const emailCell = row.insertCell(0);
+                emailCell.textContent = pet.name;
+                emailCell.setAttribute("data-label", "E-Mail");
+
+                const lastNameCell = row.insertCell(1);
+                lastNameCell.textContent = pet.kind;
+                lastNameCell.setAttribute("data-label", "Nachname");
+
+                // Füge Editier- und Lösch-Buttons hinzu
+                const actionsCell = row.insertCell(2);
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "btn btn-danger m-3 bi bi-trash";
+                deleteButton.addEventListener("click", () => deleteUserCloud(user.id));
+                actionsCell.appendChild(deleteButton);
+
+            }
+        }
+    } else {
+        console.log("Error: Response is not OK", response.statusText);
     }
 }
 
+
+// @ts-ignore
 async function editUserCloud(id: number) {
     const response: Response = await fetch(`https://userman.thuermer.red/api/users/${id}`, {
         credentials: "include"

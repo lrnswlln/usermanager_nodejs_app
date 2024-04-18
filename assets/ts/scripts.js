@@ -96,6 +96,38 @@ function addRandomUser() {
         });
     });
 }
+function addUserPet() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/2/pets", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            name: "Cpt Wuffer 2",
+                            kind: "Ein hundi"
+                        }),
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        credentials: "include"
+                    })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) return [3 /*break*/, 3];
+                    console.log("Random user added successfully!");
+                    return [4 /*yield*/, renderUserList()];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    console.error("Error adding random user:", response.statusText);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 function addUser() {
     return __awaiter(this, void 0, void 0, function () {
         var firstNameInput, lastNameInput, emailInput, passwordInput, firstname, lastname, mail, password, response;
@@ -144,7 +176,7 @@ function addUser() {
 }
 function renderUserList() {
     return __awaiter(this, void 0, void 0, function () {
-        var tableBody, response, users;
+        var tableBody, response, users, _loop_1, _i, users_1, user;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -154,44 +186,74 @@ function renderUserList() {
                         })];
                 case 1:
                     response = _a.sent();
+                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 7];
                     return [4 /*yield*/, response.json()];
                 case 2:
                     users = _a.sent();
-                    if (tableBody) {
-                        tableBody.innerHTML = "";
-                        users.forEach(function (user) {
-                            var row = tableBody.insertRow();
-                            var emailCell = row.insertCell(0);
-                            emailCell.textContent = user.mail;
-                            emailCell.setAttribute("data-label", "E-Mail");
-                            var lastNameCell = row.insertCell(1);
-                            lastNameCell.textContent = user.lastname;
-                            lastNameCell.setAttribute("data-label", "Nachname");
-                            var firstNameCell = row.insertCell(2);
-                            firstNameCell.textContent = user.firstname;
-                            firstNameCell.setAttribute("data-label", "Vorname");
-                            // Füge Editier- und Lösch-Buttons hinzu
-                            var actionsCell = row.insertCell(3);
-                            var editButton = document.createElement("button");
-                            editButton.className = "btn btn-warning m-3 bi bi-pen";
-                            editButton.addEventListener("click", function () { return editUserCloud(user.id); });
-                            console.log(user.id);
-                            actionsCell.appendChild(editButton);
-                            var deleteButton = document.createElement("button");
-                            deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                            deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
-                            actionsCell.appendChild(deleteButton);
-                            renderUserPet(user.id);
+                    if (!tableBody) return [3 /*break*/, 6];
+                    tableBody.innerHTML = "";
+                    _loop_1 = function (user) {
+                        var userPets, row, emailCell, lastNameCell, firstNameCell, petCell, actionsCell, editButton, deleteButton, petButton;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0: return [4 /*yield*/, renderUserPet(user.id)];
+                                case 1:
+                                    userPets = _b.sent();
+                                    row = tableBody.insertRow();
+                                    emailCell = row.insertCell(0);
+                                    emailCell.textContent = user.mail;
+                                    emailCell.setAttribute("data-label", "E-Mail");
+                                    lastNameCell = row.insertCell(1);
+                                    lastNameCell.textContent = user.lastname;
+                                    lastNameCell.setAttribute("data-label", "Nachname");
+                                    firstNameCell = row.insertCell(2);
+                                    firstNameCell.textContent = user.firstname;
+                                    firstNameCell.setAttribute("data-label", "Vorname");
+                                    petCell = row.insertCell(3);
+                                    petCell.textContent = userPets.map(function (pet) { return pet.name; }).join(", ");
+                                    petCell.setAttribute("data-label", "Pets");
+                                    actionsCell = row.insertCell(4);
+                                    editButton = document.createElement("button");
+                                    editButton.className = "btn btn-warning m-3 bi bi-pen";
+                                    editButton.addEventListener("click", function () { return editUserCloud(user.id); });
+                                    console.log(user.id);
+                                    actionsCell.appendChild(editButton);
+                                    deleteButton = document.createElement("button");
+                                    deleteButton.className = "btn btn-danger m-3 bi bi-trash";
+                                    deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
+                                    actionsCell.appendChild(deleteButton);
+                                    petButton = document.createElement("button");
+                                    petButton.className = "btn btn-primary m-3 bi bi-gitlab";
+                                    petButton.addEventListener("click", function () { return petAdmin(user.id); });
+                                    actionsCell.appendChild(petButton);
+                                    return [2 /*return*/];
+                            }
                         });
-                    }
-                    return [2 /*return*/];
+                    };
+                    _i = 0, users_1 = users;
+                    _a.label = 3;
+                case 3:
+                    if (!(_i < users_1.length)) return [3 /*break*/, 6];
+                    user = users_1[_i];
+                    return [5 /*yield**/, _loop_1(user)];
+                case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    console.log("Error: Response is not OK", response.statusText);
+                    _a.label = 8;
+                case 8: return [2 /*return*/];
             }
         });
     });
 }
 function renderUserPet(id) {
     return __awaiter(this, void 0, void 0, function () {
-        var responsePet, userPet;
+        var responsePet, userPets;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id, "/pets"), {
@@ -202,14 +264,58 @@ function renderUserPet(id) {
                     if (!(responsePet === null || responsePet === void 0 ? void 0 : responsePet.ok)) return [3 /*break*/, 3];
                     return [4 /*yield*/, responsePet.json()];
                 case 2:
-                    userPet = _a.sent();
-                    console.log(userPet);
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+                    userPets = _a.sent();
+                    return [2 /*return*/, userPets];
+                case 3: return [2 /*return*/, []]; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
             }
         });
     });
 }
+function petAdmin(userId) {
+    renderUserPetList(userId);
+    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
+    var petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal"));
+    petAdminModal.show();
+}
+function renderUserPetList(userId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var tableBody, userPets, _i, userPets_1, pet, row, emailCell, lastNameCell, actionsCell, deleteButton;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    tableBody = document.getElementById("userPetTableBody");
+                    return [4 /*yield*/, renderUserPet(userId)];
+                case 1:
+                    userPets = _a.sent();
+                    if (userPets) {
+                        if (tableBody) {
+                            tableBody.innerHTML = "";
+                            for (_i = 0, userPets_1 = userPets; _i < userPets_1.length; _i++) {
+                                pet = userPets_1[_i];
+                                row = tableBody.insertRow();
+                                emailCell = row.insertCell(0);
+                                emailCell.textContent = pet.name;
+                                emailCell.setAttribute("data-label", "E-Mail");
+                                lastNameCell = row.insertCell(1);
+                                lastNameCell.textContent = pet.kind;
+                                lastNameCell.setAttribute("data-label", "Nachname");
+                                actionsCell = row.insertCell(2);
+                                deleteButton = document.createElement("button");
+                                deleteButton.className = "btn btn-danger m-3 bi bi-trash";
+                                deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
+                                actionsCell.appendChild(deleteButton);
+                            }
+                        }
+                    }
+                    else {
+                        console.log("Error: Response is not OK", response.statusText);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+// @ts-ignore
 function editUserCloud(id) {
     return __awaiter(this, void 0, void 0, function () {
         var response, editUser, editFirstName, editLastName, editEmail, button, editModal;

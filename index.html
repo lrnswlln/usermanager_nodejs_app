@@ -18,6 +18,12 @@
                     onclick="addRandomUser()">
                 <span class="mx-2">Zufällige Nutzer</span>
             </button>
+
+            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="randomPetBtn"
+                    onclick="addRandomPet()">
+                <span class="mx-2">Zufälliges Tier</span>
+            </button>
+
             <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
                     onclick="renderUserList()">
                 <span class="mx-2">Get API Data</span>
@@ -60,6 +66,7 @@
                     <th class="py-3" scope="col">E-Mail</th>
                     <th class="py-3" scope="col">Nachname</th>
                     <th class="py-3" scope="col">Vorname</th>
+                    <th class="py-3" scope="col">Tiere</th>
                     <th class="py-3" scope="col">Actions</th>
                 </tr>
                 </thead>
@@ -108,6 +115,55 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal" id="petAdminModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tiere verwalten</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <table class="table table-hover align-middle table-responsive border rounded rounded-3 overflow-hidden">
+                            <thead>
+                            <tr>
+                                <th class="py-3" scope="col">Name</th>
+                                <th class="py-3" scope="col">Tier</th>
+                                <th class="py-3" scope="col">Löschen</th>
+
+                            </tr>
+                            </thead>
+                            <tbody class="table-group-divider" id="userPetTableBody">
+                            <!-- Die User werden via for-each Loop über TS eingefügt -->
+                            </tbody>
+                        </table>
+
+                        <form id="petForm">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="petName" placeholder="Tiername" required
+                                       type="text">
+                                <label for="editFirstName">Vorname</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="petKind" placeholder="Nachname" required
+                                       type="text">
+                                <label for="editLastName">Nachname</label>
+                            </div>
+
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Abbrechen</button>
+                        <button class="btn btn-success" data-bs-dismiss="modal" id="addPet" onclick="addPet()"
+                                type="button">Tier Hinzufügen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <div class="container">
         <footer class="py-3 my-5 text-white px-5">
