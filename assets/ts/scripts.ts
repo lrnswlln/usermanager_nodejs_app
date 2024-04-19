@@ -56,13 +56,20 @@ async function addRandomUser() {
     }
 }
 
-async function addUserPet() {
+// @ts-ignore
+async function addUserPet(userId: number) {
 
-    const response = await fetch("https://userman.thuermer.red/api/users/2/pets", {
+    const petName = document.getElementById("petName") as HTMLInputElement;
+    const petKind = document.getElementById("petKind") as HTMLInputElement;
+
+    const name = petName.value.trim();
+    const kind = petKind.value.trim();
+
+    const response = await fetch(`https://userman.thuermer.red/api/users/${userId}/pets`, {
         method: "POST",
         body: JSON.stringify({
-            name: "Cpt Wuffer 2",
-            kind: "Ein hundi"
+            name: name,
+            kind: kind
         }),
         headers: {
             "Content-Type": "application/json"
@@ -73,12 +80,34 @@ async function addUserPet() {
     if (response.ok) {
         console.log("Random user added successfully!");
         await renderUserList();
+        await renderUserPetListAdmin(userId);
     } else {
         console.error("Error adding random user:", response.statusText);
     }
 }
 
+// @ts-ignore
+async function deleteUserPet(userId: number, petId: number) {
 
+    const result = window.confirm("Möchten Sie das Element wirklich löschen?");
+
+    if (result) {
+        const response: Response = await fetch(`https://userman.thuermer.red/api/users/${userId}/pets/${petId}`, {
+            method: "DELETE",
+            credentials: "include"
+        });
+        if (response?.ok) {
+
+            await renderUserPetListAdmin(userId);
+            await renderUserList();
+        } else {
+            console.log("Error: Response is not OK", response.statusText);
+        }
+        console.log("Nutzer Gelöscht!");
+    }
+}
+
+// @ts-ignore
 async function addUser() {
 
     const firstNameInput = document.getElementById("firstName") as HTMLInputElement;
@@ -117,10 +146,7 @@ async function addUser() {
     }
 }
 
-
-
-
-
+// @ts-ignore
 async function renderUserList() {
     const tableBody: HTMLTableElement | null = document.getElementById("userTableBody") as HTMLTableElement;
 
@@ -135,7 +161,7 @@ async function renderUserList() {
             tableBody.innerHTML = "";
 
             for (const user of users) {
-                const userPets = await renderUserPet(user.id);
+                const userPets = await renderUserPetMain(user.id);
 
                 const row = tableBody.insertRow();
 
@@ -179,7 +205,7 @@ async function renderUserList() {
     }
 }
 
-async function renderUserPet(id: number) {
+async function renderUserPetMain(id: number) {
     const responsePet: Response = await fetch(`https://userman.thuermer.red/api/users/${id}/pets`, {
         credentials: "include"
     });
@@ -190,21 +216,35 @@ async function renderUserPet(id: number) {
     return []; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
 }
 
-
-
-
 function petAdmin(userId: number) {
 
-    renderUserPetList(userId);
+    const petFooterModal = document.getElementById("petModalFooter");
+
+    if (petFooterModal) {
+        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden
+        while (petFooterModal.firstChild) {
+            petFooterModal.removeChild(petFooterModal.firstChild);
+        }
+
+        // Das Button-Element erstellen
+        const petButton = document.createElement("button");
+        petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
+        petButton.textContent = "Mein Button";
+        petButton.addEventListener("click", () => addUserPet(userId));
+        petFooterModal.appendChild(petButton);
+    }
+
+    renderUserPetListAdmin(userId);
     // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     const petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal") as HTMLElement);
     petAdminModal.show();
 }
 
-async function renderUserPetList(userId: number) {
+// @ts-ignore
+async function renderUserPetListAdmin(userId: number) {
     const tableBody: HTMLTableElement | null = document.getElementById("userPetTableBody") as HTMLTableElement;
 
-    const userPets = await renderUserPet(userId);
+    const userPets = await renderUserPetMain(userId);
 
     if (userPets) {
 
@@ -227,16 +267,13 @@ async function renderUserPetList(userId: number) {
                 const actionsCell = row.insertCell(2);
                 const deleteButton = document.createElement("button");
                 deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                deleteButton.addEventListener("click", () => deleteUserCloud(user.id));
+                deleteButton.addEventListener("click", () => deleteUserPet(userId, pet.id));
                 actionsCell.appendChild(deleteButton);
 
             }
         }
-    } else {
-        console.log("Error: Response is not OK", response.statusText);
     }
 }
-
 
 // @ts-ignore
 async function editUserCloud(id: number) {
@@ -318,6 +355,7 @@ async function updateUserCloud(id: number) {
     }
 }
 
+// @ts-ignore
 async function deleteUserCloud(id: number) {
 
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");

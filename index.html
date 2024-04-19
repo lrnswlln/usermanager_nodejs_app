@@ -18,12 +18,6 @@
                     onclick="addRandomUser()">
                 <span class="mx-2">Zufällige Nutzer</span>
             </button>
-
-            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="randomPetBtn"
-                    onclick="addRandomPet()">
-                <span class="mx-2">Zufälliges Tier</span>
-            </button>
-
             <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
                     onclick="renderUserList()">
                 <span class="mx-2">Get API Data</span>
@@ -143,19 +137,18 @@
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="petName" placeholder="Tiername" required
                                        type="text">
-                                <label for="editFirstName">Vorname</label>
+                                <label for="petName">Tiername</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="petKind" placeholder="Nachname" required
+                                <input class="form-control" id="petKind" placeholder="Tierart" required
                                        type="text">
-                                <label for="editLastName">Nachname</label>
+                                <label for="petKind">Tierart</label>
                             </div>
 
                         </form>
 
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Abbrechen</button>
+                    <div class="modal-footer" id="petModalFooter">
                         <button class="btn btn-success" data-bs-dismiss="modal" id="addPet" onclick="addPet()"
                                 type="button">Tier Hinzufügen
                         </button>

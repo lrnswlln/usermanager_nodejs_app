@@ -96,38 +96,82 @@ function addRandomUser() {
         });
     });
 }
-function addUserPet() {
+// @ts-ignore
+function addUserPet(userId) {
     return __awaiter(this, void 0, void 0, function () {
-        var response;
+        var petName, petKind, name, kind, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/2/pets", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            name: "Cpt Wuffer 2",
-                            kind: "Ein hundi"
-                        }),
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        credentials: "include"
-                    })];
+                case 0:
+                    petName = document.getElementById("petName");
+                    petKind = document.getElementById("petKind");
+                    name = petName.value.trim();
+                    kind = petKind.value.trim();
+                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(userId, "/pets"), {
+                            method: "POST",
+                            body: JSON.stringify({
+                                name: name,
+                                kind: kind
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            credentials: "include"
+                        })];
                 case 1:
                     response = _a.sent();
-                    if (!response.ok) return [3 /*break*/, 3];
+                    if (!response.ok) return [3 /*break*/, 4];
                     console.log("Random user added successfully!");
                     return [4 /*yield*/, renderUserList()];
                 case 2:
                     _a.sent();
-                    return [3 /*break*/, 4];
+                    return [4 /*yield*/, renderUserPetListAdmin(userId)];
                 case 3:
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 4:
                     console.error("Error adding random user:", response.statusText);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    _a.label = 5;
+                case 5: return [2 /*return*/];
             }
         });
     });
 }
+// @ts-ignore
+function deleteUserPet(userId, petId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var result, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    result = window.confirm("Möchten Sie das Element wirklich löschen?");
+                    if (!result) return [3 /*break*/, 6];
+                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(userId, "/pets/").concat(petId), {
+                            method: "DELETE",
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, renderUserPetListAdmin(userId)];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, renderUserList()];
+                case 3:
+                    _a.sent();
+                    return [3 /*break*/, 5];
+                case 4:
+                    console.log("Error: Response is not OK", response.statusText);
+                    _a.label = 5;
+                case 5:
+                    console.log("Nutzer Gelöscht!");
+                    _a.label = 6;
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+// @ts-ignore
 function addUser() {
     return __awaiter(this, void 0, void 0, function () {
         var firstNameInput, lastNameInput, emailInput, passwordInput, firstname, lastname, mail, password, response;
@@ -174,6 +218,7 @@ function addUser() {
         });
     });
 }
+// @ts-ignore
 function renderUserList() {
     return __awaiter(this, void 0, void 0, function () {
         var tableBody, response, users, _loop_1, _i, users_1, user;
@@ -196,7 +241,7 @@ function renderUserList() {
                         var userPets, row, emailCell, lastNameCell, firstNameCell, petCell, actionsCell, editButton, deleteButton, petButton;
                         return __generator(this, function (_b) {
                             switch (_b.label) {
-                                case 0: return [4 /*yield*/, renderUserPet(user.id)];
+                                case 0: return [4 /*yield*/, renderUserPetMain(user.id)];
                                 case 1:
                                     userPets = _b.sent();
                                     row = tableBody.insertRow();
@@ -251,7 +296,7 @@ function renderUserList() {
         });
     });
 }
-function renderUserPet(id) {
+function renderUserPetMain(id) {
     return __awaiter(this, void 0, void 0, function () {
         var responsePet, userPets;
         return __generator(this, function (_a) {
@@ -272,43 +317,58 @@ function renderUserPet(id) {
     });
 }
 function petAdmin(userId) {
-    renderUserPetList(userId);
+    var petFooterModal = document.getElementById("petModalFooter");
+    if (petFooterModal) {
+        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden
+        while (petFooterModal.firstChild) {
+            petFooterModal.removeChild(petFooterModal.firstChild);
+        }
+        // Das Button-Element erstellen
+        var petButton = document.createElement("button");
+        petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
+        petButton.textContent = "Mein Button";
+        petButton.addEventListener("click", function () { return addUserPet(userId); });
+        petFooterModal.appendChild(petButton);
+    }
+    renderUserPetListAdmin(userId);
     // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     var petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal"));
     petAdminModal.show();
 }
-function renderUserPetList(userId) {
+// @ts-ignore
+function renderUserPetListAdmin(userId) {
     return __awaiter(this, void 0, void 0, function () {
-        var tableBody, userPets, _i, userPets_1, pet, row, emailCell, lastNameCell, actionsCell, deleteButton;
+        var tableBody, userPets, _loop_2, _i, userPets_1, pet;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     tableBody = document.getElementById("userPetTableBody");
-                    return [4 /*yield*/, renderUserPet(userId)];
+                    return [4 /*yield*/, renderUserPetMain(userId)];
                 case 1:
                     userPets = _a.sent();
                     if (userPets) {
                         if (tableBody) {
                             tableBody.innerHTML = "";
-                            for (_i = 0, userPets_1 = userPets; _i < userPets_1.length; _i++) {
-                                pet = userPets_1[_i];
-                                row = tableBody.insertRow();
-                                emailCell = row.insertCell(0);
+                            _loop_2 = function (pet) {
+                                var row = tableBody.insertRow();
+                                var emailCell = row.insertCell(0);
                                 emailCell.textContent = pet.name;
                                 emailCell.setAttribute("data-label", "E-Mail");
-                                lastNameCell = row.insertCell(1);
+                                var lastNameCell = row.insertCell(1);
                                 lastNameCell.textContent = pet.kind;
                                 lastNameCell.setAttribute("data-label", "Nachname");
-                                actionsCell = row.insertCell(2);
-                                deleteButton = document.createElement("button");
+                                // Füge Editier- und Lösch-Buttons hinzu
+                                var actionsCell = row.insertCell(2);
+                                var deleteButton = document.createElement("button");
                                 deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                                deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
+                                deleteButton.addEventListener("click", function () { return deleteUserPet(userId, pet.id); });
                                 actionsCell.appendChild(deleteButton);
+                            };
+                            for (_i = 0, userPets_1 = userPets; _i < userPets_1.length; _i++) {
+                                pet = userPets_1[_i];
+                                _loop_2(pet);
                             }
                         }
-                    }
-                    else {
-                        console.log("Error: Response is not OK", response.statusText);
                     }
                     return [2 /*return*/];
             }
@@ -398,6 +458,7 @@ function updateUserCloud(id) {
         });
     });
 }
+// @ts-ignore
 function deleteUserCloud(id) {
     return __awaiter(this, void 0, void 0, function () {
         var result, response;
