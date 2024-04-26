@@ -1,0 +1,109 @@
+//Usermanager CRUD
+
+
+###User Daten erstellen
+POST /users
+Content-Type: application/json
+
+{
+  "firstname": "value0",
+  "lastname": "value1",
+  "mail": "value2",
+  "password": "value3"
+}
+
+###User Daten Lesen
+GET /users
+
+###Userdaten Updaten
+PATCH /users/${user.id}
+Content-Type: application/json
+
+{
+  "firstname": "value0",
+  "lastname": "value1",
+  "mail": "value2",
+  "password": "value3"
+}
+
+###User Löschen
+DELETE /users/${user.id}
+
+
+
+//Pet Crud
+
+###User Pet  Daten erstellen
+POST /users/${user.id}/pets
+Content-Type: application/json
+
+{
+  "name": "value0",
+  "kind": "value1"
+}
+
+###Tiere des Users mit der ID {user.id} abrufen
+GET /users/${user.id}/pets
+
+
+###Updaten der Daten eines Tieres {pet.id} vom User {user.id}
+PATCH /users/${user.id}/pets/${pet.id}
+Content-Type: application/json
+
+{
+  "name": "value0",
+  "kind": "value1"
+}
+
+###Löschen des Tieres {pet.id} vom Nutzer {user.id}
+DELETE /users/${user.id}/pets/${pet.id}
+
+
+
+//Abfrgane, die einen Fehler aufrufen
+###User Daten erstellen --> user mail ist bereits bekannt
+POST /users
+Content-Type: application/json
+
+{
+  "firstname": "value0",
+  "lastname": "value1",
+  "mail": "existing_mail",
+  "password": "value3"
+}
+
+###User Daten erstellen --> nicht alle Daten ausgefüllt
+POST /users
+Content-Type: application/json
+
+{
+  "firstname": "",
+  "lastname": "value1",
+  "mail": "",
+  "password": "value3"
+}
+
+###User Löschen, der nicht existiert
+DELETE /users/${notExistingUser.id}
+
+
+###User Pet  Daten erstellen für einen Nutzer der nicht existiert
+POST /users/${notExistingUser.id}/pets
+Content-Type: application/json
+
+{
+  "name": "value0",
+  "kind": "value1"
+}
+
+
+###User Pet  Daten beaarbeiten für ein Tier das nicht existiert
+PATCH /users/${notExistingUser.id}/pets/{NotExistingPet.id}
+Content-Type: application/json
+
+{
+  "name": "value0"
+}
+
+
+
