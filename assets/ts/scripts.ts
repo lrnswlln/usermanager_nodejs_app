@@ -62,6 +62,9 @@ async function addUserPet(userId: number) {
     const petName = document.getElementById("petName") as HTMLInputElement;
     const petKind = document.getElementById("petKind") as HTMLInputElement;
 
+
+
+
     const name = petName.value.trim();
     const kind = petKind.value.trim();
 
@@ -78,11 +81,15 @@ async function addUserPet(userId: number) {
     });
 
     if (response.ok) {
-        console.log("Random user added successfully!");
+        console.log("Tier erfolgreich hinzugefügt");
         await renderUserList();
         await renderUserPetListAdmin(userId);
+
+        petName.value = "";
+        petKind.value = "";
+
     } else {
-        console.error("Error adding random user:", response.statusText);
+        console.error("Error adding pet:", response.statusText);
     }
 }
 
@@ -143,6 +150,7 @@ async function addUser() {
         await renderUserList();
     } else {
         console.log("Error: Response is not OK", response.statusText);
+        alert(response.statusText)
     }
 }
 
@@ -229,7 +237,7 @@ function petAdmin(userId: number) {
         // Das Button-Element erstellen
         const petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
-        petButton.textContent = "Mein Button";
+        petButton.textContent = "Tier Hinzufügen";
         petButton.addEventListener("click", () => addUserPet(userId));
         petFooterModal.appendChild(petButton);
     }
@@ -257,11 +265,11 @@ async function renderUserPetListAdmin(userId: number) {
 
                 const emailCell = row.insertCell(0);
                 emailCell.textContent = pet.name;
-                emailCell.setAttribute("data-label", "E-Mail");
+                emailCell.setAttribute("data-label", "Tiername");
 
                 const lastNameCell = row.insertCell(1);
                 lastNameCell.textContent = pet.kind;
-                lastNameCell.setAttribute("data-label", "Nachname");
+                lastNameCell.setAttribute("data-label", "Tierart");
 
                 // Füge Editier- und Lösch-Buttons hinzu
                 const actionsCell = row.insertCell(2);

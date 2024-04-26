@@ -121,16 +121,18 @@ function addUserPet(userId) {
                 case 1:
                     response = _a.sent();
                     if (!response.ok) return [3 /*break*/, 4];
-                    console.log("Random user added successfully!");
+                    console.log("Tier erfolgreich hinzugefügt");
                     return [4 /*yield*/, renderUserList()];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, renderUserPetListAdmin(userId)];
                 case 3:
                     _a.sent();
+                    petName.value = "";
+                    petKind.value = "";
                     return [3 /*break*/, 5];
                 case 4:
-                    console.error("Error adding random user:", response.statusText);
+                    console.error("Error adding pet:", response.statusText);
                     _a.label = 5;
                 case 5: return [2 /*return*/];
             }
@@ -212,6 +214,7 @@ function addUser() {
                     return [3 /*break*/, 4];
                 case 3:
                     console.log("Error: Response is not OK", response.statusText);
+                    alert(response.statusText);
                     _a.label = 4;
                 case 4: return [2 /*return*/];
             }
@@ -326,7 +329,7 @@ function petAdmin(userId) {
         // Das Button-Element erstellen
         var petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
-        petButton.textContent = "Mein Button";
+        petButton.textContent = "Tier Hinzufügen";
         petButton.addEventListener("click", function () { return addUserPet(userId); });
         petFooterModal.appendChild(petButton);
     }
@@ -353,10 +356,10 @@ function renderUserPetListAdmin(userId) {
                                 var row = tableBody.insertRow();
                                 var emailCell = row.insertCell(0);
                                 emailCell.textContent = pet.name;
-                                emailCell.setAttribute("data-label", "E-Mail");
+                                emailCell.setAttribute("data-label", "Tiername");
                                 var lastNameCell = row.insertCell(1);
                                 lastNameCell.textContent = pet.kind;
-                                lastNameCell.setAttribute("data-label", "Nachname");
+                                lastNameCell.setAttribute("data-label", "Tierart");
                                 // Füge Editier- und Lösch-Buttons hinzu
                                 var actionsCell = row.insertCell(2);
                                 var deleteButton = document.createElement("button");

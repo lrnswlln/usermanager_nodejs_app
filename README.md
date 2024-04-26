@@ -4,6 +4,11 @@ by Laurin Sawellion
 
 ## Getting started
 
+Da keine generierten Javascript Dateien in der Abgabe enthalten sein dürfen,
+müssen diese erstmal über Webstorm internen Compiler generiert werden, damit die website funktioniert.
+
+After that:
+
 To launch the website, just open the index.html with Google Chrome.
 
 
