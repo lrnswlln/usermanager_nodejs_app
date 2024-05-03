@@ -188,7 +188,7 @@ function addUser() {
                     lastname = lastNameInput.value.trim();
                     mail = emailInput.value.trim();
                     password = passwordInput.value.trim();
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users", {
+                    return [4 /*yield*/, fetch("/users", {
                             method: "POST",
                             body: JSON.stringify({
                                 firstname: firstname,

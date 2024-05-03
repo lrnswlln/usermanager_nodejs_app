@@ -1,12 +1,14 @@
 {
+
+  "main": "index.js",
   "scripts": {
     "test": "npx prettier --write scss/",
     "watch": "watch 'npm run css' ./scss",
     "build": "npm-run-all copy:bootstrap css:compile",
-    "copy:bootstrap": "cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.* assets/js/",
-    "copy:bootstrap-icon": "cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.* assets/fonts/",
-    "css:compile": "sass --load-path=node_modules --style=compressed --embed-source-map ./scss/main.scss ./assets/css/main.css",
-    "css:prefix": "postcss --replace assets/css/main.css --use autoprefixer --map",
+    "copy:bootstrap": "cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.* public/assets/js/",
+    "copy:bootstrap-icon": "cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.* public/assets/fonts/",
+    "css:compile": "sass --load-path=node_modules --style=compressed --embed-source-map ./scss/main.scss public/assets/css/main.css",
+    "css:prefix": "postcss --replace public/assets/css/main.css --use autoprefixer --map",
     "css": "npm-run-all css:compile css:prefix"
   },
   "devDependencies": {
@@ -21,6 +23,7 @@
     "@types/express": "^4.17.21",
     "body-parser": "^1.20.2",
     "bootstrap-icons": "^1.11.1",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "mongoose": "^8.3.2"
   }

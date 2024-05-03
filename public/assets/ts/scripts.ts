@@ -127,7 +127,7 @@ async function addUser() {
     const mail = emailInput.value.trim();
     const password = passwordInput.value.trim();
 
-    const response: Response = await fetch("https://userman.thuermer.red/api/users", {
+    const response: Response = await fetch("/users", {
         method: "POST",
         body: JSON.stringify({
             firstname: firstname,
