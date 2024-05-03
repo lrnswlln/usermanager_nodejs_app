@@ -12,12 +12,17 @@
   "devDependencies": {
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.1",
+    "nodemon": "^3.1.0",
     "npm-run-all": "^4.1.5",
     "sass": "^1.69.5",
     "watch": "^0.13.0"
   },
   "dependencies": {
     "@types/bootstrap": "^5.2.10",
-    "bootstrap-icons": "^1.11.1"
+    "@types/express": "^4.17.21",
+    "body-parser": "^1.20.2",
+    "bootstrap-icons": "^1.11.1",
+    "express": "^4.19.2",
+    "mongoose": "^8.3.2"
   }
 }
