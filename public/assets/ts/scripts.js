@@ -229,7 +229,7 @@ function renderUserList() {
             switch (_a.label) {
                 case 0:
                     tableBody = document.getElementById("userTableBody");
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users", {
+                    return [4 /*yield*/, fetch("/users", {
                             credentials: "include"
                         })];
                 case 1:
@@ -384,7 +384,7 @@ function editUserCloud(id) {
         var response, editUser, editFirstName, editLastName, editEmail, button, editModal;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id), {
+                case 0: return [4 /*yield*/, fetch("/users/".concat(id), {
                         credentials: "include"
                     })];
                 case 1:
@@ -430,7 +430,7 @@ function updateUserCloud(id) {
                     editFirstName = editFirstNameInput.value.trim();
                     editLastName = editLastNameInput.value.trim();
                     if (!(editFirstName && editLastName)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id), {
+                    return [4 /*yield*/, fetch("/users/".concat(id), {
                             method: "PATCH",
                             body: JSON.stringify({
                                 firstname: editFirstName,
@@ -470,7 +470,7 @@ function deleteUserCloud(id) {
                 case 0:
                     result = window.confirm("Möchten Sie das Element wirklich löschen?");
                     if (!result) return [3 /*break*/, 5];
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id), {
+                    return [4 /*yield*/, fetch("/users/".concat(id), {
                             method: "DELETE",
                             credentials: "include"
                         })];

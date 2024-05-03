@@ -158,7 +158,7 @@ async function addUser() {
 async function renderUserList() {
     const tableBody: HTMLTableElement | null = document.getElementById("userTableBody") as HTMLTableElement;
 
-    const response: Response = await fetch("https://userman.thuermer.red/api/users", {
+    const response: Response = await fetch("/users", {
         credentials: "include"
     });
 
@@ -285,7 +285,7 @@ async function renderUserPetListAdmin(userId: number) {
 
 // @ts-ignore
 async function editUserCloud(id: number) {
-    const response: Response = await fetch(`https://userman.thuermer.red/api/users/${id}`, {
+    const response: Response = await fetch(`/users/${id}`, {
         credentials: "include"
     });
     if (response?.ok) {
@@ -334,7 +334,7 @@ async function updateUserCloud(id: number) {
         if (editFirstName && editLastName) {
             // Aktualisiert die Daten des ausgewählten Users
 
-            const response: Response = await fetch(`https://userman.thuermer.red/api/users/${id}`, {
+            const response: Response = await fetch(`/users/${id}`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     firstname: editFirstName,
@@ -369,7 +369,7 @@ async function deleteUserCloud(id: number) {
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
     if (result) {
-        const response: Response = await fetch(`https://userman.thuermer.red/api/users/${id}`, {
+        const response: Response = await fetch(`/users/${id}`, {
             method: "DELETE",
             credentials: "include"
         });
