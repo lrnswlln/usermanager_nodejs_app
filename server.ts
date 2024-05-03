@@ -1,5 +1,6 @@
 import express = require('express');
 import cors = require('cors');
+import {v4 as uuidv4} from 'uuid';
 const app = express();
 const PORT = 3001;
 import * as Path from "path";
@@ -25,7 +26,7 @@ let users: User[] = [];
 app.post('/users', (req, res) => {
     try {
         const { firstname, lastname, mail, password } = req.body;
-        const newUser = new User(users.length + 1, firstname, lastname, mail, password);
+        const newUser = new User(uuidv4(), firstname, lastname, mail, password);
         users.push(newUser);
         res.json(newUser);
     } catch (error) {
