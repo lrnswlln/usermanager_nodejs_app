@@ -57,7 +57,7 @@ async function addRandomUser() {
 }
 
 // @ts-ignore
-async function addUserPet(userId: number) {
+async function addUserPet(userId: string) {
 
     const petName = document.getElementById("petName") as HTMLInputElement;
     const petKind = document.getElementById("petKind") as HTMLInputElement;
@@ -94,7 +94,7 @@ async function addUserPet(userId: number) {
 }
 
 // @ts-ignore
-async function deleteUserPet(userId: number, petId: number) {
+async function deleteUserPet(userId: string, petId: string) {
 
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
@@ -213,7 +213,7 @@ async function renderUserList() {
     }
 }
 
-async function renderUserPetMain(id: number) {
+async function renderUserPetMain(id: string) {
     const responsePet: Response = await fetch(`https://userman.thuermer.red/api/users/${id}/pets`, {
         credentials: "include"
     });
@@ -224,7 +224,7 @@ async function renderUserPetMain(id: number) {
     return []; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
 }
 
-function petAdmin(userId: number) {
+function petAdmin(userId: string) {
 
     const petFooterModal = document.getElementById("petModalFooter");
 
@@ -249,7 +249,7 @@ function petAdmin(userId: number) {
 }
 
 // @ts-ignore
-async function renderUserPetListAdmin(userId: number) {
+async function renderUserPetListAdmin(userId: string) {
     const tableBody: HTMLTableElement | null = document.getElementById("userPetTableBody") as HTMLTableElement;
 
     const userPets = await renderUserPetMain(userId);
@@ -284,7 +284,7 @@ async function renderUserPetListAdmin(userId: number) {
 }
 
 // @ts-ignore
-async function editUserCloud(id: number) {
+async function editUserCloud(id: string) {
     const response: Response = await fetch(`/users/${id}`, {
         credentials: "include"
     });
@@ -318,7 +318,7 @@ async function editUserCloud(id: number) {
     }
 }
 
-async function updateUserCloud(id: number) {
+async function updateUserCloud(id: string) {
 
     // Überprüft, ob ein User bearbeitet wird
     if (id !== null) {
@@ -364,7 +364,7 @@ async function updateUserCloud(id: number) {
 }
 
 // @ts-ignore
-async function deleteUserCloud(id: number) {
+async function deleteUserCloud(id: string) {
 
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 

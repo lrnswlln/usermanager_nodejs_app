@@ -21,13 +21,23 @@ class User {
     ) {}
 }
 
+class Pet {
+    constructor(
+        public id: number,
+        public userId: number,
+        public name: string,
+        public kind: string
+    ) {}
+}
+
 let users: User[] = [];
+let pets: Pet[] = [];
 
 
 app.post('/users', (req, res) => {
     try {
         const { firstname, lastname, mail, password } = req.body;
-        const newUser = new User(users.length + 1, firstname, lastname, mail, password);
+        const newUser = new User(uuidv4(), firstname, lastname, mail, password);
         users.push(newUser);
         res.json(newUser);
     } catch (error) {
@@ -84,6 +94,60 @@ app.delete('/users/:userId', (req, res) => {
         const userId: number = parseInt(req.params.userId);
         users = users.filter(user => user.id !== userId);
         res.json({ message: 'Benutzer wurde gelöscht' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Haustierdaten erstellen
+app.post('/users/:userId/pets', (req, res) => {
+    try {
+        const userId: number = parseInt(req.params.userId);
+        const newPet = new Pet(pets.length + 1, userId, req.body.name, req.body.kind);
+        pets.push(newPet);
+        res.json(newPet);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Haustierdaten lesen
+app.get('/users/:userId/pets', (req, res) => {
+    try {
+        const userId: number = parseInt(req.params.userId);
+        const userPets: Pet[] = pets.filter(pet => pet.userId === userId);
+        res.json(userPets);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Haustierdaten aktualisieren
+app.patch('/users/:userId/pets/:petId', (req, res) => {
+    try {
+        const userId: number = parseInt(req.params.userId);
+        const petId: number = parseInt(req.params.petId);
+        const index: number = pets.findIndex(pet => pet.id === petId && pet.userId === userId);
+        if (index !== -1) {
+            const updatedPet = pets[index];
+            updatedPet.name = req.body.name || updatedPet.name;
+            updatedPet.kind = req.body.kind || updatedPet.kind;
+            res.json(updatedPet);
+        } else {
+            res.status(404).json({ message: 'Haustier nicht gefunden' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Haustier löschen
+app.delete('/users/:userId/pets/:petId', (req, res) => {
+    try {
+        const userId: number = parseInt(req.params.userId);
+        const petId: number = parseInt(req.params.petId);
+        pets = pets.filter(pet => !(pet.id === petId && pet.userId === userId));
+        res.json({ message: 'Haustier wurde gelöscht' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
