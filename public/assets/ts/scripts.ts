@@ -68,7 +68,7 @@ async function addUserPet(userId: string) {
     const name = petName.value.trim();
     const kind = petKind.value.trim();
 
-    const response = await fetch(`https://userman.thuermer.red/api/users/${userId}/pets`, {
+    const response = await fetch(`/users/${userId}/pets`, {
         method: "POST",
         body: JSON.stringify({
             name: name,
@@ -99,7 +99,7 @@ async function deleteUserPet(userId: string, petId: string) {
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
     if (result) {
-        const response: Response = await fetch(`https://userman.thuermer.red/api/users/${userId}/pets/${petId}`, {
+        const response: Response = await fetch(`/users/${userId}/pets/${petId}`, {
             method: "DELETE",
             credentials: "include"
         });
@@ -214,7 +214,7 @@ async function renderUserList() {
 }
 
 async function renderUserPetMain(id: string) {
-    const responsePet: Response = await fetch(`https://userman.thuermer.red/api/users/${id}/pets`, {
+    const responsePet: Response = await fetch(`/users/${id}/pets`, {
         credentials: "include"
     });
     if (responsePet?.ok) {

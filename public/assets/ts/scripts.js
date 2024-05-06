@@ -107,7 +107,7 @@ function addUserPet(userId) {
                     petKind = document.getElementById("petKind");
                     name = petName.value.trim();
                     kind = petKind.value.trim();
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(userId, "/pets"), {
+                    return [4 /*yield*/, fetch("/users/".concat(userId, "/pets"), {
                             method: "POST",
                             body: JSON.stringify({
                                 name: name,
@@ -148,7 +148,7 @@ function deleteUserPet(userId, petId) {
                 case 0:
                     result = window.confirm("Möchten Sie das Element wirklich löschen?");
                     if (!result) return [3 /*break*/, 6];
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(userId, "/pets/").concat(petId), {
+                    return [4 /*yield*/, fetch("/users/".concat(userId, "/pets/").concat(petId), {
                             method: "DELETE",
                             credentials: "include"
                         })];
@@ -304,7 +304,7 @@ function renderUserPetMain(id) {
         var responsePet, userPets;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users/".concat(id, "/pets"), {
+                case 0: return [4 /*yield*/, fetch("/users/".concat(id, "/pets"), {
                         credentials: "include"
                     })];
                 case 1:
