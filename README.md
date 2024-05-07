@@ -16,6 +16,7 @@ Die IDs werden nun vom Server über das UUID Packe UUID für die einzelnen Nutze
 Das hat allerdings zur Folge, dass einige Funktionen umgebaut werden mussten, da die IDs nun keine Numbers sondern Strings sind.
 
 Die severhttp-test.http sollte alle notwendigen Test für die Crud und Crd funktionen enthalten udn wurde auf die erstellten User Demodaten angepasst.
+Die gesamte Anwendung funktioniert auch schon über des Webfrontend und kann theoretisch auch darüber noch zusätzlich getestet werden. Dort ist auch ein Button um schnell einfache Random User zu erstellen
 
 
 Start NodeJS Server with
