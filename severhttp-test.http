@@ -4,6 +4,7 @@
 ###User Daten erstellen
 POST /users
 Content-Type: application/json
+Host: localhost:3001
 
 {
   "firstname": "value0",
@@ -14,27 +15,31 @@ Content-Type: application/json
 
 ###User Daten Lesen
 GET /users
+Host: localhost:3001
 
 ###Userdaten Updaten
-PATCH /users/${user.id}
+PATCH /users/0c83b7c4-71e5-470b-85ca-4946b43ba2d5
 Content-Type: application/json
+Host: localhost:3001
+
 
 {
   "firstname": "value0",
   "lastname": "value1",
-  "mail": "value2",
   "password": "value3"
 }
 
 ###User Löschen
-DELETE /users/${user.id}
+DELETE /users/0c83b7c4-71e5-470b-85ca-4946b43ba2d5
+Host: localhost:3001
 
 
 
 //Pet Crud
 
 ###User Pet  Daten erstellen
-POST /users/${user.id}/pets
+POST /users/0c83b7c4-71e5-470b-85ca-4946b43ba2d5/pets
+Host: localhost:3001
 Content-Type: application/json
 
 {
@@ -43,38 +48,33 @@ Content-Type: application/json
 }
 
 ###Tiere des Users mit der ID {user.id} abrufen
-GET /users/${user.id}/pets
+GET /users/0c83b7c4-71e5-470b-85ca-4946b43ba2d5/pets
+Host: localhost:3001
 
-
-###Updaten der Daten eines Tieres {pet.id} vom User {user.id}
-PATCH /users/${user.id}/pets/${pet.id}
-Content-Type: application/json
-
-{
-  "name": "value0",
-  "kind": "value1"
-}
 
 ###Löschen des Tieres {pet.id} vom Nutzer {user.id}
-DELETE /users/${user.id}/pets/${pet.id}
+DELETE /users/0c83b7c4-71e5-470b-85ca-4946b43ba2d5/pets/2
+Host: localhost:3001
 
 
 
 //Abfrgane, die einen Fehler aufrufen
 ###User Daten erstellen --> user mail ist bereits bekannt
 POST /users
+Host: localhost:3001
 Content-Type: application/json
 
 {
   "firstname": "value0",
   "lastname": "value1",
-  "mail": "existing_mail",
+  "mail": "max@example.com",
   "password": "value3"
 }
 
 ###User Daten erstellen --> nicht alle Daten ausgefüllt
 POST /users
 Content-Type: application/json
+Host: localhost:3001
 
 {
   "firstname": "",
@@ -83,26 +83,16 @@ Content-Type: application/json
   "password": "value3"
 }
 
-###User Löschen, der nicht existiert
-DELETE /users/${notExistingUser.id}
-
-
-###User Pet  Daten erstellen für einen Nutzer der nicht existiert
-POST /users/${notExistingUser.id}/pets
+###Nicht existierenden User bearbeiten
+PATCH /users/123
 Content-Type: application/json
+Host: localhost:3001
 
 {
-  "name": "value0",
-  "kind": "value1"
-}
-
-
-###User Pet  Daten beaarbeiten für ein Tier das nicht existiert
-PATCH /users/${notExistingUser.id}/pets/{NotExistingPet.id}
-Content-Type: application/json
-
-{
-  "name": "value0"
+  "firstname": "sadfsgd",
+  "lastname": "value1",
+  "mail": "dfsgd",
+  "password": "value3"
 }
 
 
