@@ -1,16 +1,5 @@
-# WebP1_Hausuebung_2
+# WebP2_Hausuebung_2
 by Laurin Sawellion
-
-
-## Getting started
-
-Da keine generierten Javascript Dateien in der Abgabe enthalten sein dürfen,
-müssen diese erstmal über Webstorm internen Compiler generiert werden, damit die website funktioniert.
-
-After that:
-
-To launch the website, just open the index.html with Google Chrome.
-
 
 
 ## How to use setup for development
@@ -18,6 +7,27 @@ To launch the website, just open the index.html with Google Chrome.
 ```
 npm install
 ```
+
+
+## Allgemein und How to use
+
+Die IDs werden nun vom Server über das UUID Packe UUID für die einzelnen Nutzer erstellt, da durch ein einzelnes Hochzählen der Useranzahl im Array sich IDs doppeln können, wenn zwischendurch auch wieder nutzer gelöscht werden udn dann weitere hinzugefügt werden. Das wird durch das nutzen der UUIDs veränder.
+
+Das hat allerdings zur Folge, dass einige Funktionen umgebaut werden mussten, da die IDs nun keine Numbers sondern Strings sind.
+
+Die severhttp-test.http sollte alle notwendigen Test für die Crud und Crd funktionen enthalten udn wurde auf die erstellten User Demodaten angepasst.
+
+
+Start NodeJS Server with
+`npm start` 
+or 
+`node server.js`
+
+Der Server läuft auf 
+http://localhost:3001 
+wenn keine andere Konfiguration vorgenommen wird
+
+
 
 ## Attention
 
