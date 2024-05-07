@@ -31,18 +31,30 @@ class Pet {
 let users: User[] = [];
 let pets: Pet[] = [];
 
-app.post('/users', (req, res) => {
+app.post('/users', (req: express.Request, res: express.Response) => {
     try {
         const { firstname, lastname, mail, password } = req.body;
+
+        // Überprüfen, ob alle Felder ausgefüllt sind
+        if (!firstname || !lastname || !mail || !password) {
+            throw new Error("Alle Felder müssen ausgefüllt sein.");
+        }
+
+        // Überprüfen, ob die E-Mail-Adresse bereits vorhanden ist
+        const existingUser = users.find(user => user.mail === mail);
+        if (existingUser) {
+            throw new Error("Diese E-Mail-Adresse ist bereits registriert.");
+        }
+
         const newUser = new User(uuidv4(), firstname, lastname, mail, password);
         users.push(newUser);
         res.json(newUser);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
 });
 
-app.get('/users', (req, res) => {
+app.get('/users', (req: express.Request, res: express.Response) => {
     try {
         res.json(users);
     } catch (error) {
@@ -50,7 +62,7 @@ app.get('/users', (req, res) => {
     }
 });
 
-app.get('/users/:userId', (req, res) => {
+app.get('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const user = users.find(user => user.id === userId);
@@ -64,7 +76,7 @@ app.get('/users/:userId', (req, res) => {
     }
 });
 
-app.patch('/users/:userId', (req, res) => {
+app.patch('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const index: number = users.findIndex(user => user.id === userId);
@@ -83,7 +95,7 @@ app.patch('/users/:userId', (req, res) => {
     }
 });
 
-app.delete('/users/:userId', (req, res) => {
+app.delete('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         users = users.filter(user => user.id !== userId);
@@ -93,7 +105,7 @@ app.delete('/users/:userId', (req, res) => {
     }
 });
 
-app.post('/users/:userId/pets', (req, res) => {
+app.post('/users/:userId/pets', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const newPet = new Pet(pets.length + 1, userId, req.body.name, req.body.kind);
@@ -104,7 +116,7 @@ app.post('/users/:userId/pets', (req, res) => {
     }
 });
 
-app.get('/users/:userId/pets', (req, res) => {
+app.get('/users/:userId/pets', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const userPets: Pet[] = pets.filter(pet => pet.userId === userId);
@@ -114,7 +126,7 @@ app.get('/users/:userId/pets', (req, res) => {
     }
 });
 
-app.delete('/users/:userId/pets/:petId', (req, res) => {
+app.delete('/users/:userId/pets/:petId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const petId: number = parseInt(req.params.petId);
