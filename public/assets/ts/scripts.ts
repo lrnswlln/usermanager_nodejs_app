@@ -34,7 +34,7 @@ function generateRandomUser() {
 async function addRandomUser() {
     const randomUser = generateRandomUser();
 
-    const response = await fetch("https://userman.thuermer.red/api/users", {
+    const response = await fetch("/users", {
         method: "POST",
         body: JSON.stringify({
             firstname: randomUser.firstname,
@@ -305,7 +305,7 @@ async function editUserCloud(id: string) {
 
             const button = document.getElementById('updateUser') as HTMLButtonElement;
             if (button) {
-                button.setAttribute('onclick', `updateUserCloud(${id})`);
+                button.setAttribute('onclick', `updateUserCloud('${id}')`);
             }
 
             // Öffnet das Bootstrap 5 Modal für die Bearbeitung
@@ -353,7 +353,7 @@ async function updateUserCloud(id: string) {
 
             const button = document.getElementById('updateUser') as HTMLButtonElement;
             if (button) {
-                button.setAttribute('onclick', `updateUser(${null})`);
+                button.setAttribute('onclick', `updateUserCloud(${null})`);
             }
 
             await renderUserList()

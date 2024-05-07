@@ -67,7 +67,7 @@ function addRandomUser() {
             switch (_a.label) {
                 case 0:
                     randomUser = generateRandomUser();
-                    return [4 /*yield*/, fetch("https://userman.thuermer.red/api/users", {
+                    return [4 /*yield*/, fetch("/users", {
                             method: "POST",
                             body: JSON.stringify({
                                 firstname: randomUser.firstname,
@@ -404,7 +404,7 @@ function editUserCloud(id) {
                         editEmail.value = editUser.mail;
                         button = document.getElementById('updateUser');
                         if (button) {
-                            button.setAttribute('onclick', "updateUserCloud(".concat(id, ")"));
+                            button.setAttribute('onclick', "updateUserCloud('".concat(id, "')"));
                         }
                         editModal = new bootstrap.Modal(document.getElementById("editModal"));
                         editModal.show();
@@ -447,7 +447,7 @@ function updateUserCloud(id) {
                     editModal.hide();
                     button = document.getElementById('updateUser');
                     if (button) {
-                        button.setAttribute('onclick', "updateUser(".concat(null, ")"));
+                        button.setAttribute('onclick', "updateUserCloud(".concat(null, ")"));
                     }
                     return [4 /*yield*/, renderUserList()];
                 case 2:

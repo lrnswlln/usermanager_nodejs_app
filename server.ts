@@ -1,19 +1,17 @@
 import express = require('express');
 import cors = require('cors');
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 const app = express();
 const PORT = 3001;
-import * as Path from "path";
 
-app.use(cors()); // Aktiviere CORS für alle Routen
+app.use(cors());
 app.use(express.static('public'));
-app.use(express.json()); // Erlaube das Parsen von JSON-Anfragen
-app.use(express.urlencoded({extended: false}));
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 class User {
     constructor(
-        public id: number,
+        public id: string,
         public firstname: string,
         public lastname: string,
         public mail: string,
@@ -24,7 +22,7 @@ class User {
 class Pet {
     constructor(
         public id: number,
-        public userId: number,
+        public userId: string,
         public name: string,
         public kind: string
     ) {}
@@ -32,7 +30,6 @@ class Pet {
 
 let users: User[] = [];
 let pets: Pet[] = [];
-
 
 app.post('/users', (req, res) => {
     try {
@@ -45,7 +42,6 @@ app.post('/users', (req, res) => {
     }
 });
 
-// Benutzerdaten lesen
 app.get('/users', (req, res) => {
     try {
         res.json(users);
@@ -56,7 +52,7 @@ app.get('/users', (req, res) => {
 
 app.get('/users/:userId', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         const user = users.find(user => user.id === userId);
         if (user) {
             res.json(user);
@@ -68,10 +64,9 @@ app.get('/users/:userId', (req, res) => {
     }
 });
 
-// Benutzerdaten aktualisieren
 app.patch('/users/:userId', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         const index: number = users.findIndex(user => user.id === userId);
         if (index !== -1) {
             const updatedUser = users[index];
@@ -88,10 +83,9 @@ app.patch('/users/:userId', (req, res) => {
     }
 });
 
-// Benutzer löschen
 app.delete('/users/:userId', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         users = users.filter(user => user.id !== userId);
         res.json({ message: 'Benutzer wurde gelöscht' });
     } catch (error) {
@@ -99,10 +93,9 @@ app.delete('/users/:userId', (req, res) => {
     }
 });
 
-// Haustierdaten erstellen
 app.post('/users/:userId/pets', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         const newPet = new Pet(pets.length + 1, userId, req.body.name, req.body.kind);
         pets.push(newPet);
         res.json(newPet);
@@ -111,10 +104,9 @@ app.post('/users/:userId/pets', (req, res) => {
     }
 });
 
-// Haustierdaten lesen
 app.get('/users/:userId/pets', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         const userPets: Pet[] = pets.filter(pet => pet.userId === userId);
         res.json(userPets);
     } catch (error) {
@@ -122,29 +114,9 @@ app.get('/users/:userId/pets', (req, res) => {
     }
 });
 
-// Haustierdaten aktualisieren
-app.patch('/users/:userId/pets/:petId', (req, res) => {
-    try {
-        const userId: number = parseInt(req.params.userId);
-        const petId: number = parseInt(req.params.petId);
-        const index: number = pets.findIndex(pet => pet.id === petId && pet.userId === userId);
-        if (index !== -1) {
-            const updatedPet = pets[index];
-            updatedPet.name = req.body.name || updatedPet.name;
-            updatedPet.kind = req.body.kind || updatedPet.kind;
-            res.json(updatedPet);
-        } else {
-            res.status(404).json({ message: 'Haustier nicht gefunden' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Haustier löschen
 app.delete('/users/:userId/pets/:petId', (req, res) => {
     try {
-        const userId: number = parseInt(req.params.userId);
+        const userId: string = req.params.userId;
         const petId: number = parseInt(req.params.petId);
         pets = pets.filter(pet => !(pet.id === petId && pet.userId === userId));
         res.json({ message: 'Haustier wurde gelöscht' });
