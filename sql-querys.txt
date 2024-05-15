@@ -1,0 +1,36 @@
+### Die Id des Users wird nicht über die Datenbank vergeben, sondern von einem UUID Package in Typescript.
+Das hat zur Folge, dass beim erstellen eines neuen Benutzers die ID mit angegeben werden muss.
+so sieht die dann die ID Beispielhaft aus:
+8c83b7c4-71e5-470b-85ca-4946b43ba2d5
+
+###
+
+//Create User
+INSERT INTO Users (id, firstname, lastname, mail, password)
+VALUES ('1b83b7c4-71e5-470b-95ca-4946b43ba2d5', 'Demofirstname', 'Demolastname', 'demomail@example.de', 'd4f5g6');
+
+//Read all useres
+SELECT * FROM Users;
+
+//Read a user with the ID <...>
+SELECT * FROM Users WHERE id = '0c83b7c4-71e5-470b-85ca-4946b43ba2d5';
+
+//Update the User with id <...>
+UPDATE Users
+SET firstname = 'Updatefirstname', lastname = 'Updatelastname', mail = 'Updatemail@example.de', password = 'dwae3rwsf'
+WHERE id = '0c83b7c4-71e5-470b-85ca-4946b43ba2d5';
+
+DELETE FROM Users WHERE id = '0c83b7c4-71e5-470b-85ca-4946b43ba2d5';
+
+
+##Pets
+
+//Create Pet
+INSERT INTO Pets (userId, name, kind)
+VALUES ('2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9', 'Wauwau', 'Hund');
+
+//Read Pets from User
+SELECT * FROM Pets WHERE userId = '2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9';
+
+//Delete Pets from User
+DELETE FROM Pets WHERE id = 1 AND userId = '2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9';

@@ -31,7 +31,7 @@ class Pet {
 let users: User[] = [];
 let pets: Pet[] = [];
 
-//Basic Users and Pets
+//Demo Users und Pets
 const user1 = new User('2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9', 'Max', 'Mustermann', 'max@example.com', '123456');
 const user2 = new User('0c83b7c4-71e5-470b-85ca-4946b43ba2d5', 'Maria', 'Musterfrau', 'maria@example.com', 'abcdef');
 users.push(user1, user2);
@@ -43,7 +43,7 @@ pets.push(pet1, pet2);
 
 
 
-// POST: Erstellt einen neuen Benutzer
+// POST User
 app.post('/users', (req: express.Request, res: express.Response) => {
     try {
         const { firstname, lastname, mail, password } = req.body;
@@ -61,22 +61,22 @@ app.post('/users', (req: express.Request, res: express.Response) => {
 
         const newUser = new User(uuidv4(), firstname, lastname, mail, password);
         users.push(newUser);
-        res.status(201).json(newUser); // 201: Created
+        res.status(201).json(newUser);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// GET: Liefert alle Benutzer
+// GET Users
 app.get('/users', (req: express.Request, res: express.Response) => {
     try {
-        res.status(200).json(users); // 200: OK
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// GET: Liefert einen einzelnen Benutzer basierend auf der ID
+// GET User
 app.get('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
@@ -84,14 +84,14 @@ app.get('/users/:userId', (req: express.Request, res: express.Response) => {
         if (user) {
             res.status(200).json(user); // 200: OK
         } else {
-            res.status(404).json({ message: 'Benutzer nicht gefunden' }); // 404: Not Found
+            res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// PATCH: Aktualisiert einen Benutzer
+// PATCH User
 app.patch('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
@@ -104,58 +104,65 @@ app.patch('/users/:userId', (req: express.Request, res: express.Response) => {
             updatedUser.password = req.body.password || updatedUser.password;
             res.status(200).json(updatedUser); // 200: OK
         } else {
-            res.status(404).json({ message: 'Benutzer nicht gefunden' }); // 404: Not Found
+            res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE: Löscht einen Benutzer
+// DELETE User
 app.delete('/users/:userId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         users = users.filter(user => user.id !== userId);
-        res.status(200).json({ message: 'Benutzer wurde gelöscht' }); // 200: OK
+        res.status(200).json({ message: 'Benutzer wurde gelöscht' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST: Erstellt ein neues Haustier für einen Benutzer
+// POST Pet for user
 app.post('/users/:userId/pets', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const newPet = new Pet(pets.length + 1, userId, req.body.name, req.body.kind);
         pets.push(newPet);
-        res.status(201).json(newPet); // 201: Created
+        res.status(201).json(newPet);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// GET: Liefert alle Haustiere eines Benutzers
+// GET: for user Pets
 app.get('/users/:userId/pets', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const userPets: Pet[] = pets.filter(pet => pet.userId === userId);
-        res.status(200).json(userPets); // 200: OK
+        res.status(200).json(userPets);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE: Löscht ein Haustier eines Benutzers
+// DELETE for user Pets
 app.delete('/users/:userId/pets/:petId', (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const petId: number = parseInt(req.params.petId);
         pets = pets.filter(pet => !(pet.id === petId && pet.userId === userId));
-        res.status(200).json({ message: 'Haustier wurde gelöscht' }); // 200: OK
+        res.status(200).json({ message: 'Haustier wurde gelöscht' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+app.use(notFound);
+
+function notFound(req: express.Request, res: express.Response): void {
+    res.status(404);
+    res.send("Die Angeforderte Resource existiert nicht, überprüfe deine Anfrage");
+}
 
 app.listen(PORT, () => {
     console.log(`Die App läuft unter http://localhost:${PORT}`);
