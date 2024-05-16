@@ -213,8 +213,8 @@ function addUser() {
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 3:
-                    console.log("Error: Response is not OK", response.statusText);
-                    alert(response.statusText);
+                    console.log("Error: Response is not OK", response.status);
+                    alert(response.body);
                     _a.label = 4;
                 case 4: return [2 /*return*/];
             }

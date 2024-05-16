@@ -151,8 +151,8 @@ async function addUser() {
 
         await renderUserList();
     } else {
-        console.log("Error: Response is not OK", response.statusText);
-        alert(response.statusText)
+        console.log("Error: Response is not OK", response.status);
+        alert(response.body)
     }
 }
 

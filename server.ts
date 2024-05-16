@@ -54,23 +54,9 @@ class Pet {
     ) {}
 }
 
-let users: User[] = [];
-let pets: Pet[] = [];
-
-//Demo Users und Pets
-const user1 = new User('2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9', 'Max', 'Mustermann', 'max@example.com', '123456');
-const user2 = new User('0c83b7c4-71e5-470b-85ca-4946b43ba2d5', 'Maria', 'Musterfrau', 'maria@example.com', 'abcdef');
-users.push(user1, user2);
-
-const pet1 = new Pet(1, '2d4c3e2e-56b3-4a89-a2e0-3d53046f54a9', 'Bello', 'Hund');
-const pet2 = new Pet(2, '0c83b7c4-71e5-470b-85ca-4946b43ba2d5', 'Whiskers', 'Katze');
-pets.push(pet1, pet2);
-
-
-
 
 // POST User
-app.post('/users', (req: express.Request, res: express.Response) => {
+app.post('/users', async (req: express.Request, res: express.Response) => {
     try {
         const { firstname, lastname, mail, password } = req.body;
 
@@ -79,14 +65,17 @@ app.post('/users', (req: express.Request, res: express.Response) => {
             return;
         }
 
-        const existingUser = users.find(user => user.mail === mail);
-        if (existingUser) {
+        // Überprüfen, ob die E-Mail bereits vorhanden ist
+        const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE mail = ?', [mail]);
+        if (existingUser && existingUser.length > 0) {
             res.status(400).json({ error: "Diese E-Mail-Adresse ist bereits registriert." });
             return;
         }
 
-        const newUser = new User(uuidv4(), firstname, lastname, mail, password);
-        users.push(newUser);
+        const id = uuidv4();
+        await (await connection).query('INSERT INTO Users (id, firstname, lastname, mail, password) VALUES (?, ?, ?, ?, ?)', [id, firstname, lastname, mail, password]);
+
+        const newUser = { id, firstname, lastname, mail, password };
         res.status(201).json(newUser);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -94,21 +83,21 @@ app.post('/users', (req: express.Request, res: express.Response) => {
 });
 
 // GET Users
-app.get('/users', (req: express.Request, res: express.Response) => {
+app.get('/users', async (req: express.Request, res: express.Response) => {
     try {
+        const [users] = await (await connection).execute('SELECT * FROM Users');
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// GET User
-app.get('/users/:userId', (req: express.Request, res: express.Response) => {
+app.get('/users/:userId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const user = users.find(user => user.id === userId);
-        if (user) {
-            res.status(200).json(user); // 200: OK
+        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
+        if (user && user.length > 0) {
+            res.status(200).json(user[0]);
         } else {
             res.status(404).json({ message: 'Benutzer nicht gefunden' });
         }
@@ -117,31 +106,52 @@ app.get('/users/:userId', (req: express.Request, res: express.Response) => {
     }
 });
 
+
 // PATCH User
-app.patch('/users/:userId', (req: express.Request, res: express.Response) => {
+app.patch('/users/:userId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const index: number = users.findIndex(user => user.id === userId);
-        if (index !== -1) {
-            const updatedUser = users[index];
-            updatedUser.firstname = req.body.firstname || updatedUser.firstname;
-            updatedUser.lastname = req.body.lastname || updatedUser.lastname;
-            updatedUser.mail = req.body.mail || updatedUser.mail;
-            updatedUser.password = req.body.password || updatedUser.password;
-            res.status(200).json(updatedUser); // 200: OK
-        } else {
-            res.status(404).json({ message: 'Benutzer nicht gefunden' });
+        const { firstname, lastname, mail, password } = req.body;
+
+        let updateQuery = 'UPDATE Users SET';
+        const updateUserValues = [];
+
+        if (firstname) {
+            updateQuery += ' firstname = ?,';
+            updateUserValues.push(firstname);
         }
+        if (lastname) {
+            updateQuery += ' lastname = ?,';
+            updateUserValues.push(lastname);
+        }
+        if (mail) {
+            updateQuery += ' mail = ?,';
+            updateUserValues.push(mail);
+        }
+        if (password) {
+            updateQuery += ' password = ?,';
+            updateUserValues.push(password);
+        }
+
+        // Entferne das letzte Komma
+        updateQuery = updateQuery.slice(0, -1);
+
+        updateQuery += ' WHERE id = ?';
+        updateUserValues.push(userId);
+
+        await (await connection).query(updateQuery, updateUserValues);
+
+        res.status(200).json({ message: 'Benutzer aktualisiert' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
 // DELETE User
-app.delete('/users/:userId', (req: express.Request, res: express.Response) => {
+app.delete('/users/:userId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        users = users.filter(user => user.id !== userId);
+        await (await connection).execute('DELETE FROM Users WHERE id = ?', [userId]);
         res.status(200).json({ message: 'Benutzer wurde gelöscht' });
     } catch (error) {
         res.status(500).json({ error: error.message });
