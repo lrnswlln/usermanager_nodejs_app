@@ -10,6 +10,8 @@ class UserObject {
 
 
 
+
+
 document.querySelector("#formCreate").addEventListener("submit", (event) => {
     event.preventDefault();
     addUser();

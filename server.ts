@@ -1,13 +1,39 @@
 import express = require('express');
 import cors = require('cors');
 import { v4 as uuidv4 } from 'uuid';
+import * as mysql from 'mysql2/promise'
+import * as dotenv from 'dotenv';
 const app = express();
 const PORT = 3001;
+
+dotenv.config();
 
 app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+
+
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
+});
+
+// Funktion zur Bestätigung der Verbindung und Fehlerbehandlung
+async function checkDatabaseConnection() {
+    try {
+        await (await connection).connect();
+        console.log("Die Verbindung zur Datenbank wurde erfolgreich hergestellt.");
+    } catch (error) {
+        console.error("Fehler beim Herstellen der Verbindung zur Datenbank:", error);
+        process.exit(1); // Beende den Prozess, wenn die Verbindung fehlschlägt
+    }
+}
+
+checkDatabaseConnection();
 
 class User {
     constructor(

@@ -26,31 +26,57 @@
 
         </header>
 
-        <div class="create mb-5">
-            <h2 class="w-100 text-center text-white py-3">Nutzer Erstellen</h2>
-            <form id="formCreate">
-                <div class="form-floating mb-3">
-                    <input class="form-control" id="email" placeholder="name@example.com" required type="email">
-                    <label for="email">E-Mail Adresse</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input class="form-control" id="firstName" placeholder="Vorname" required type="text">
-                    <label for="firstName">Vorname</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input class="form-control" id="lastName" placeholder="Nachname" required type="text">
-                    <label for="lastName">Nachname</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input class="form-control" id="password" placeholder="Passwort" required type="password">
-                    <label for="password">Passwort</label>
-                </div>
 
-                <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
-                    <span class="mx-2">Nutzer anlegen</span>
-                </button>
-            </form>
+        <div class="row">
+            <div class="col">
+                <div class="create mb-5">
+                    <h2 class="w-100 text-center text-white py-3">Nutzer Erstellen</h2>
+                    <form id="formCreate">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="email" placeholder="name@example.com" required type="email">
+                            <label for="email">E-Mail Adresse</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="firstName" placeholder="Vorname" required type="text">
+                            <label for="firstName">Vorname</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="lastName" placeholder="Nachname" required type="text">
+                            <label for="lastName">Nachname</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="password" placeholder="Passwort" required type="password">
+                            <label for="password">Passwort</label>
+                        </div>
+
+                        <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
+                            <span class="mx-2">Nutzer anlegen</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="login mb-5">
+                    <h2 class="w-100 text-center text-white py-3">Einloggen</h2>
+                    <form id="formLogin">
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="emailLogin" placeholder="name@example.com" required type="email">
+                            <label for="emailLogin">E-Mail Adresse</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="passwordLogin" placeholder="Passwort" required type="password">
+                            <label for="passwordLogin">Passwort</label>
+                        </div>
+
+                        <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
+                            <span class="mx-2">Nutzer anlegen</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
+
 
         <div class="display-users" id="userList">
             <h2 class="w-100 text-center text-white py-3">Benutzer Liste</h2>
