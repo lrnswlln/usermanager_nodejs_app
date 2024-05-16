@@ -35,25 +35,6 @@ async function checkDatabaseConnection() {
 
 checkDatabaseConnection();
 
-class User {
-    constructor(
-        public id: string,
-        public firstname: string,
-        public lastname: string,
-        public mail: string,
-        public password: string
-    ) {}
-}
-
-class Pet {
-    constructor(
-        public id: number,
-        public userId: string,
-        public name: string,
-        public kind: string
-    ) {}
-}
-
 
 // POST User
 app.post('/users', async (req: express.Request, res: express.Response) => {
