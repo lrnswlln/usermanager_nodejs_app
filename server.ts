@@ -158,40 +158,61 @@ app.delete('/users/:userId', async (req: express.Request, res: express.Response)
     }
 });
 
-// POST Pet for user
-app.post('/users/:userId/pets', (req: express.Request, res: express.Response) => {
+// POST Haustier für Benutzer
+
+app.post('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const newPet = new Pet(pets.length + 1, userId, req.body.name, req.body.kind);
-        pets.push(newPet);
+        const { name, kind } = req.body;
+
+        if (!name || !kind) {
+            res.status(400).json({ error: "Alle Felder müssen ausgefüllt sein." });
+            return;
+        }
+
+        const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE id = ?', [userId]);
+        if (!existingUser || existingUser.length === 0) {
+            res.status(404).json({ error: "Benutzer nicht gefunden." });
+            return;
+        }
+
+        const [result]: any[] = await (await connection).query('INSERT INTO Pets (userId, name, kind) VALUES (?, ?, ?)', [userId, name, kind]);
+        const newPet = { id: result.insertId, userId, name, kind };
         res.status(201).json(newPet);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-
-// GET: for user Pets
-app.get('/users/:userId/pets', (req: express.Request, res: express.Response) => {
+// GET Haustiere eines Benutzers
+app.get('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const userPets: Pet[] = pets.filter(pet => pet.userId === userId);
+        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
         res.status(200).json(userPets);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE for user Pets
-app.delete('/users/:userId/pets/:petId', (req: express.Request, res: express.Response) => {
+// DELETE Haustier eines Benutzers
+app.delete('/users/:userId/pets/:petId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
         const petId: number = parseInt(req.params.petId);
-        pets = pets.filter(pet => !(pet.id === petId && pet.userId === userId));
-        res.status(200).json({ message: 'Haustier wurde gelöscht' });
+
+        const [pet]: any[] = await (await connection).query('SELECT * FROM Pets WHERE id = ? AND userId = ?', [petId, userId]);
+        if (!pet || pet.length === 0) {
+            res.status(404).json({ error: "Haustier nicht gefunden." });
+            return;
+        }
+
+        await (await connection).query('DELETE FROM Pets WHERE id = ?', [petId]);
+        res.status(200).json({ message: "Haustier wurde gelöscht." });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 app.use(notFound);
 
