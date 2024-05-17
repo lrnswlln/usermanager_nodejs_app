@@ -44,9 +44,45 @@ var UserObject = /** @class */ (function () {
     }
     return UserObject;
 }());
+// Funktion zum Abrufen der Benutzerdaten
+function fetchUserData() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, userData, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    return [4 /*yield*/, fetch('/user')];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) return [3 /*break*/, 3];
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    userData = _a.sent();
+                    console.log("Benutzerdaten:", userData);
+                    return [3 /*break*/, 4];
+                case 3:
+                    console.log("Fehler beim Abrufen der Benutzerdaten:", response.status);
+                    _a.label = 4;
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    error_1 = _a.sent();
+                    console.error("Fehler beim Abrufen der Benutzerdaten:", error_1);
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+// Eventlistener für das Laden der Seite
+window.addEventListener('load', fetchUserData);
 document.querySelector("#formCreate").addEventListener("submit", function (event) {
     event.preventDefault();
     addUser();
+});
+document.querySelector("#formLogin").addEventListener("submit", function (event) {
+    event.preventDefault();
+    loginUser();
 });
 function generateRandomUser() {
     var firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia"];
@@ -174,6 +210,46 @@ function deleteUserPet(userId, petId) {
     });
 }
 // @ts-ignore
+function loginUser() {
+    return __awaiter(this, void 0, void 0, function () {
+        var emailLoginInput, passwordLoginInput, mail, password, response, errorMessage;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    emailLoginInput = document.getElementById("emailLogin");
+                    passwordLoginInput = document.getElementById("passwordLogin");
+                    mail = emailLoginInput.value.trim();
+                    password = passwordLoginInput.value.trim();
+                    return [4 /*yield*/, fetch("/login", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                mail: mail,
+                                password: password
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) return [3 /*break*/, 2];
+                    emailLoginInput.value = "";
+                    passwordLoginInput.value = "";
+                    console.log("login successfully!");
+                    return [3 /*break*/, 4];
+                case 2:
+                    console.log("Error: Response is not OK", response.statusText);
+                    return [4 /*yield*/, response.text()];
+                case 3:
+                    errorMessage = _a.sent();
+                    alert(errorMessage);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 function addUser() {
     return __awaiter(this, void 0, void 0, function () {
         var firstNameInput, lastNameInput, emailInput, passwordInput, firstname, lastname, mail, password, response;

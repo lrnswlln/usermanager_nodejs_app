@@ -9,12 +9,38 @@ class UserObject {
 }
 
 
+// Funktion zum Abrufen der Benutzerdaten
+async function fetchUserData() {
+    try {
+        const response = await fetch('/user'); // Dies ruft den Endpunkt auf, den wir zuvor definiert haben (/user)
+        if (response.ok) {
+            const userData = await response.json();
+            console.log("Benutzerdaten:", userData);
+            // Hier kannst du die Benutzerdaten entsprechend verwenden, z.B. sie im UI anzeigen
+        } else {
+            console.log("Fehler beim Abrufen der Benutzerdaten:", response.status);
+        }
+    } catch (error) {
+        console.error("Fehler beim Abrufen der Benutzerdaten:", error);
+    }
+}
+
+// Eventlistener für das Laden der Seite
+window.addEventListener('load', fetchUserData);
+
+
+
 
 
 
 document.querySelector("#formCreate").addEventListener("submit", (event) => {
     event.preventDefault();
     addUser();
+});
+
+document.querySelector("#formLogin").addEventListener("submit", (event) => {
+    event.preventDefault();
+    loginUser();
 });
 
 function generateRandomUser() {
@@ -117,6 +143,40 @@ async function deleteUserPet(userId: string, petId: string) {
 }
 
 // @ts-ignore
+
+async function loginUser() {
+
+    const emailLoginInput = document.getElementById("emailLogin") as HTMLInputElement;
+    const passwordLoginInput = document.getElementById("passwordLogin") as HTMLInputElement;
+
+    const mail: string = emailLoginInput.value.trim();
+    const password: string = passwordLoginInput.value.trim();
+
+    const response: Response = await fetch("/login", {
+        method: "POST",
+        body: JSON.stringify({
+            mail: mail,
+            password: password
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "include"
+    });
+    if (response.ok) {
+
+        emailLoginInput.value = "";
+        passwordLoginInput.value = "";
+
+        console.log("login successfully!");
+    } else {
+        console.log("Error: Response is not OK", response.statusText);
+        const errorMessage = await response.text();
+        alert(errorMessage);
+    }
+}
+
+
 async function addUser() {
 
     const firstNameInput = document.getElementById("firstName") as HTMLInputElement;

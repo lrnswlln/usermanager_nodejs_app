@@ -1,8 +1,11 @@
 import express = require('express');
 import cors = require('cors');
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import * as mysql from 'mysql2/promise'
 import * as dotenv from 'dotenv';
+import session = require('express-session');
+
+
 const app = express();
 const PORT = 3001;
 
@@ -11,8 +14,25 @@ dotenv.config();
 app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 
+
+app.use(session({
+    cookie: {
+        maxAge: 60 * 60 * 1000,
+        sameSite: true,
+        secure: false
+    },
+    secret: Math.random().toString(),
+    resave: false,
+    saveUninitialized: false,
+}));
+
+declare module 'express-session' {
+    interface SessionData {
+        userId: string; // Hinzufügen der userId-Eigenschaft zur Session
+    }
+}
 
 
 const connection = mysql.createConnection({
@@ -36,30 +56,143 @@ async function checkDatabaseConnection() {
 checkDatabaseConnection();
 
 
+// Middleware für die Überprüfung der Authentifizierung
+function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+    if (req.session && req.session.userId) {
+        return next(); // Der Benutzer ist authentifiziert
+    } else {
+        res.status(401).json({ error: "Unauthorisierter Zugriff" });
+    }
+}
+
+// POST Login
+app.post('/login', async (req: express.Request, res: express.Response) => {
+    try {
+        const { mail, password } = req.body;
+
+        // Überprüfen, ob E-Mail und Passwort vorhanden sind
+        if (!mail || !password) {
+            res.status(400).json({ error: "E-Mail und Passwort werden benötigt." });
+            return;
+        }
+
+        // Überprüfen, ob der Benutzer vorhanden ist
+        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE mail = ? AND password = ?', [mail, password]);
+        if (!user || user.length === 0) {
+            res.status(401).json({ error: "Ungültige Anmeldeinformationen." });
+            return;
+        }
+
+        // Benutzer in der Session speichern
+        req.session.userId = user.id;
+
+        // Testzwecke: Ausgabe der Benutzerdaten in der Konsole
+        console.log("Erfolgreich angemeldeter Benutzer:", user);
+
+        res.status(200).json({ message: "Anmeldung erfolgreich" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/user', async (req: express.Request, res: express.Response) => {
+    try {
+        // Überprüfen, ob der Benutzer durch den Session-Cookie angemeldet ist
+        if (req.session && req.session.userId) {
+            const userId: string = req.session.userId;
+
+            // Benutzerdaten abrufen
+            const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
+            if (user) {
+                res.status(200).json(user);
+                return;
+            }
+        }
+        res.status(401).json({ error: "Nicht authentifiziert oder Benutzer nicht gefunden." });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Geschützte Route für den Zugriff auf Benutzerdaten
+app.get('/user/profile', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+
+        // Benutzerdaten abrufen
+        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Geschützte Route für den Zugriff auf die Haustiere des Benutzers
+app.get('/user/pets', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+
+        // Haustiere des Benutzers abrufen
+        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
+        res.status(200).json(userPets);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+// POST Login
+app.post('/login', async (req: express.Request, res: express.Response) => {
+    try {
+        const { mail, password } = req.body;
+
+        // Überprüfen, ob E-Mail und Passwort vorhanden sind
+        if (!mail || !password) {
+            res.status(400).json({ error: "E-Mail und Passwort werden benötigt." });
+            return;
+        }
+
+        // Überprüfen, ob der Benutzer vorhanden ist
+        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE mail = ? AND password = ?', [mail, password]);
+        if (!user || user.length === 0) {
+            res.status(401).json({ error: "Ungültige Anmeldeinformationen." });
+            return;
+        }
+
+        // Hier kannst du ggf. eine Session-Variable setzen oder andere Authentifizierungsmaßnahmen durchführen
+
+        res.status(200).json({ message: "Anmeldung erfolgreich" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 // POST User
 app.post('/users', async (req: express.Request, res: express.Response) => {
     try {
-        const { firstname, lastname, mail, password } = req.body;
+        const {firstname, lastname, mail, password} = req.body;
 
         if (!firstname || !lastname || !mail || !password) {
-            res.status(400).json({ error: "Alle Felder müssen ausgefüllt sein." });
+            res.status(400).json({error: "Alle Felder müssen ausgefüllt sein."});
             return;
         }
 
         // Überprüfen, ob die E-Mail bereits vorhanden ist
         const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE mail = ?', [mail]);
         if (existingUser && existingUser.length > 0) {
-            res.status(400).json({ error: "Diese E-Mail-Adresse ist bereits registriert." });
+            res.status(400).json({error: "Diese E-Mail-Adresse ist bereits registriert."});
             return;
         }
 
         const id = uuidv4();
         await (await connection).query('INSERT INTO Users (id, firstname, lastname, mail, password) VALUES (?, ?, ?, ?, ?)', [id, firstname, lastname, mail, password]);
 
-        const newUser = { id, firstname, lastname, mail, password };
+        const newUser = {id, firstname, lastname, mail, password};
         res.status(201).json(newUser);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -69,7 +202,7 @@ app.get('/users', async (req: express.Request, res: express.Response) => {
         const [users] = await (await connection).execute('SELECT * FROM Users');
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -80,10 +213,10 @@ app.get('/users/:userId', async (req: express.Request, res: express.Response) =>
         if (user && user.length > 0) {
             res.status(200).json(user[0]);
         } else {
-            res.status(404).json({ message: 'Benutzer nicht gefunden' });
+            res.status(404).json({message: 'Benutzer nicht gefunden'});
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -92,7 +225,7 @@ app.get('/users/:userId', async (req: express.Request, res: express.Response) =>
 app.patch('/users/:userId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const { firstname, lastname, mail, password } = req.body;
+        const {firstname, lastname, mail, password} = req.body;
 
         let updateQuery = 'UPDATE Users SET';
         const updateUserValues = [];
@@ -122,9 +255,9 @@ app.patch('/users/:userId', async (req: express.Request, res: express.Response) 
 
         await (await connection).query(updateQuery, updateUserValues);
 
-        res.status(200).json({ message: 'Benutzer aktualisiert' });
+        res.status(200).json({message: 'Benutzer aktualisiert'});
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -133,9 +266,9 @@ app.delete('/users/:userId', async (req: express.Request, res: express.Response)
     try {
         const userId: string = req.params.userId;
         await (await connection).execute('DELETE FROM Users WHERE id = ?', [userId]);
-        res.status(200).json({ message: 'Benutzer wurde gelöscht' });
+        res.status(200).json({message: 'Benutzer wurde gelöscht'});
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -144,24 +277,24 @@ app.delete('/users/:userId', async (req: express.Request, res: express.Response)
 app.post('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
-        const { name, kind } = req.body;
+        const {name, kind} = req.body;
 
         if (!name || !kind) {
-            res.status(400).json({ error: "Alle Felder müssen ausgefüllt sein." });
+            res.status(400).json({error: "Alle Felder müssen ausgefüllt sein."});
             return;
         }
 
         const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE id = ?', [userId]);
         if (!existingUser || existingUser.length === 0) {
-            res.status(404).json({ error: "Benutzer nicht gefunden." });
+            res.status(404).json({error: "Benutzer nicht gefunden."});
             return;
         }
 
         const [result]: any[] = await (await connection).query('INSERT INTO Pets (userId, name, kind) VALUES (?, ?, ?)', [userId, name, kind]);
-        const newPet = { id: result.insertId, userId, name, kind };
+        const newPet = {id: result.insertId, userId, name, kind};
         res.status(201).json(newPet);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 // GET Haustiere eines Benutzers
@@ -171,7 +304,7 @@ app.get('/users/:userId/pets', async (req: express.Request, res: express.Respons
         const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
         res.status(200).json(userPets);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
@@ -183,14 +316,14 @@ app.delete('/users/:userId/pets/:petId', async (req: express.Request, res: expre
 
         const [pet]: any[] = await (await connection).query('SELECT * FROM Pets WHERE id = ? AND userId = ?', [petId, userId]);
         if (!pet || pet.length === 0) {
-            res.status(404).json({ error: "Haustier nicht gefunden." });
+            res.status(404).json({error: "Haustier nicht gefunden."});
             return;
         }
 
         await (await connection).query('DELETE FROM Pets WHERE id = ?', [petId]);
-        res.status(200).json({ message: "Haustier wurde gelöscht." });
+        res.status(200).json({message: "Haustier wurde gelöscht."});
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
 
