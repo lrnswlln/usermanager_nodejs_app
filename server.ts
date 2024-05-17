@@ -11,28 +11,35 @@ const PORT = 3001;
 
 dotenv.config();
 
-app.use(cors());
+const corsOptions = {
+    credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
 
-app.use(session({
-    cookie: {
-        maxAge: 60 * 60 * 1000,
-        sameSite: true,
-        secure: false
-    },
-    secret: Math.random().toString(),
-    resave: false,
-    saveUninitialized: false,
-}));
 
+// Erweitere die SessionData-Schnittstelle
 declare module 'express-session' {
     interface SessionData {
         userId: string; // Hinzufügen der userId-Eigenschaft zur Session
     }
 }
+
+// Konfiguriere express-session Middleware
+app.use(session({
+    secret: Math.random().toString(), // Bitte ersetze 'geheimnisvollesgeheimnis' durch ein zufälliges Geheimnis
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24, // Gültigkeitsdauer des Session-Cookies (hier: 1 Tag)
+        secure: false, // Setze auf 'true', wenn du HTTPS verwendest
+        httpOnly: true // Session-Cookie kann nur über HTTP übertragen werden, nicht über JavaScript
+    }
+}));
 
 
 const connection = mysql.createConnection({
@@ -65,6 +72,10 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
     }
 }
 
+
+
+
+
 // POST Login
 app.post('/login', async (req: express.Request, res: express.Response) => {
     try {
@@ -84,35 +95,18 @@ app.post('/login', async (req: express.Request, res: express.Response) => {
         }
 
         // Benutzer in der Session speichern
-        req.session.userId = user.id;
+        req.session.userId = user[0].id;
+
 
         // Testzwecke: Ausgabe der Benutzerdaten in der Konsole
         console.log("Erfolgreich angemeldeter Benutzer:", user);
-
+        console.log(req.session.userId)
         res.status(200).json({ message: "Anmeldung erfolgreich" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-app.get('/user', async (req: express.Request, res: express.Response) => {
-    try {
-        // Überprüfen, ob der Benutzer durch den Session-Cookie angemeldet ist
-        if (req.session && req.session.userId) {
-            const userId: string = req.session.userId;
-
-            // Benutzerdaten abrufen
-            const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
-            if (user) {
-                res.status(200).json(user);
-                return;
-            }
-        }
-        res.status(401).json({ error: "Nicht authentifiziert oder Benutzer nicht gefunden." });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 // Geschützte Route für den Zugriff auf Benutzerdaten
 app.get('/user/profile', requireAuth, async (req: express.Request, res: express.Response) => {
@@ -135,34 +129,6 @@ app.get('/user/pets', requireAuth, async (req: express.Request, res: express.Res
         // Haustiere des Benutzers abrufen
         const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
         res.status(200).json(userPets);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
-
-// POST Login
-app.post('/login', async (req: express.Request, res: express.Response) => {
-    try {
-        const { mail, password } = req.body;
-
-        // Überprüfen, ob E-Mail und Passwort vorhanden sind
-        if (!mail || !password) {
-            res.status(400).json({ error: "E-Mail und Passwort werden benötigt." });
-            return;
-        }
-
-        // Überprüfen, ob der Benutzer vorhanden ist
-        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE mail = ? AND password = ?', [mail, password]);
-        if (!user || user.length === 0) {
-            res.status(401).json({ error: "Ungültige Anmeldeinformationen." });
-            return;
-        }
-
-        // Hier kannst du ggf. eine Session-Variable setzen oder andere Authentifizierungsmaßnahmen durchführen
-
-        res.status(200).json({ message: "Anmeldung erfolgreich" });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -206,6 +172,8 @@ app.get('/users', async (req: express.Request, res: express.Response) => {
     }
 });
 
+
+//Get USer
 app.get('/users/:userId', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;

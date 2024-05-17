@@ -9,29 +9,63 @@ class UserObject {
 }
 
 
-// Funktion zum Abrufen der Benutzerdaten
-async function fetchUserData() {
+
+
+async function fetchUserProfile(): Promise<any> {
     try {
-        const response = await fetch('/user'); // Dies ruft den Endpunkt auf, den wir zuvor definiert haben (/user)
-        if (response.ok) {
-            const userData = await response.json();
-            console.log("Benutzerdaten:", userData);
-            // Hier kannst du die Benutzerdaten entsprechend verwenden, z.B. sie im UI anzeigen
-        } else {
-            console.log("Fehler beim Abrufen der Benutzerdaten:", response.status);
+        const response = await fetch('/user/profile', {
+            method: 'GET',
+            credentials: 'include' // Sendet Cookies mit der Anfrage
+        });
+        if (!response.ok) {
+            throw new Error('Fehler beim Abrufen der Benutzerdaten');
         }
+        const userData = await response.json();
+        return userData;
     } catch (error) {
-        console.error("Fehler beim Abrufen der Benutzerdaten:", error);
+        console.error('Fehler beim Abrufen der Benutzerdaten:', error.message);
+        throw error;
     }
 }
 
-// Eventlistener für das Laden der Seite
-window.addEventListener('load', fetchUserData);
+async function fetchUserPets(): Promise<any> {
+    try {
+        const response = await fetch('/user/pets', {
+            method: 'GET',
+            credentials: 'include' // Sendet Cookies mit der Anfrage
+        });
+        if (!response.ok) {
+            throw new Error('Fehler beim Abrufen der Haustiere');
+        }
+        const userPets = await response.json();
+        return userPets;
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Haustiere:', error.message);
+        throw error;
+    }
 
+}
 
+// Beispiel für die Verwendung der Funktionen
+async function fetchData() {
+    try {
+        const userProfile = await fetchUserProfile();
+        console.log('Benutzerdaten:', userProfile);
 
+        const userPets = await fetchUserPets();
+        console.log('Haustiere des Benutzers:', userPets);
+    } catch (error) {
+        console.error('Fehler beim Abrufen der Daten:', error.message);
+    }
+}
 
+function onPageLoaded(callback: () => void): void {
+    window.addEventListener('load', callback);
+}
 
+onPageLoaded(() => {
+    fetchData();
+});
 
 document.querySelector("#formCreate").addEventListener("submit", (event) => {
     event.preventDefault();

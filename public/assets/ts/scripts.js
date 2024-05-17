@@ -44,38 +44,96 @@ var UserObject = /** @class */ (function () {
     }
     return UserObject;
 }());
-// Funktion zum Abrufen der Benutzerdaten
-function fetchUserData() {
+function fetchUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
         var response, userData, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    return [4 /*yield*/, fetch('/user')];
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch('/user/profile', {
+                            method: 'GET',
+                            credentials: 'include' // Sendet Cookies mit der Anfrage
+                        })];
                 case 1:
                     response = _a.sent();
-                    if (!response.ok) return [3 /*break*/, 3];
+                    if (!response.ok) {
+                        throw new Error('Fehler beim Abrufen der Benutzerdaten');
+                    }
                     return [4 /*yield*/, response.json()];
                 case 2:
                     userData = _a.sent();
-                    console.log("Benutzerdaten:", userData);
-                    return [3 /*break*/, 4];
+                    return [2 /*return*/, userData];
                 case 3:
-                    console.log("Fehler beim Abrufen der Benutzerdaten:", response.status);
-                    _a.label = 4;
-                case 4: return [3 /*break*/, 6];
-                case 5:
                     error_1 = _a.sent();
-                    console.error("Fehler beim Abrufen der Benutzerdaten:", error_1);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    console.error('Fehler beim Abrufen der Benutzerdaten:', error_1.message);
+                    throw error_1;
+                case 4: return [2 /*return*/];
             }
         });
     });
 }
-// Eventlistener für das Laden der Seite
-window.addEventListener('load', fetchUserData);
+function fetchUserPets() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, userPets, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch('/user/pets', {
+                            method: 'GET',
+                            credentials: 'include' // Sendet Cookies mit der Anfrage
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error('Fehler beim Abrufen der Haustiere');
+                    }
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    userPets = _a.sent();
+                    return [2 /*return*/, userPets];
+                case 3:
+                    error_2 = _a.sent();
+                    console.error('Fehler beim Abrufen der Haustiere:', error_2.message);
+                    throw error_2;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+// Beispiel für die Verwendung der Funktionen
+function fetchData() {
+    return __awaiter(this, void 0, void 0, function () {
+        var userProfile, userPets, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetchUserProfile()];
+                case 1:
+                    userProfile = _a.sent();
+                    console.log('Benutzerdaten:', userProfile);
+                    return [4 /*yield*/, fetchUserPets()];
+                case 2:
+                    userPets = _a.sent();
+                    console.log('Haustiere des Benutzers:', userPets);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_3 = _a.sent();
+                    console.error('Fehler beim Abrufen der Daten:', error_3.message);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+function onPageLoaded(callback) {
+    window.addEventListener('load', callback);
+}
+onPageLoaded(function () {
+    fetchData();
+});
 document.querySelector("#formCreate").addEventListener("submit", function (event) {
     event.preventDefault();
     addUser();
