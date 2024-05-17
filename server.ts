@@ -81,14 +81,15 @@ app.post('/login', async (req: express.Request, res: express.Response) => {
     try {
         const { mail, password } = req.body;
 
-        // Überprüfen, ob E-Mail und Passwort vorhanden sind
+        // Überprüfen, ob E-Mail und Passwort vorhanden
         if (!mail || !password) {
             res.status(400).json({ error: "E-Mail und Passwort werden benötigt." });
             return;
         }
 
-        // Überprüfen, ob der Benutzer vorhanden ist
+        // Überprüfen, ob der Benutzer vorhanden
         const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE mail = ? AND password = ?', [mail, password]);
+        console.log('Test' + user.length);
         if (!user || user.length === 0) {
             res.status(401).json({ error: "Ungültige Anmeldeinformationen." });
             return;
@@ -113,7 +114,6 @@ app.get('/user/profile', requireAuth, async (req: express.Request, res: express.
     try {
         const userId: string = req.session.userId;
 
-        // Benutzerdaten abrufen
         const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
         res.status(200).json(user);
     } catch (error) {
@@ -126,13 +126,31 @@ app.get('/user/pets', requireAuth, async (req: express.Request, res: express.Res
     try {
         const userId: string = req.session.userId;
 
-        // Haustiere des Benutzers abrufen
         const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
         res.status(200).json(userPets);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+app.post('/logout', async (req: express.Request, res: express.Response) => {
+    try {
+        // Zerstöre den Session-Cookie
+        req.session.destroy((err: any) => {
+            if (err) {
+                res.status(500).json({ error: "Beim Abmelden ist ein Fehler aufgetreten." });
+                return;
+            }
+            res.clearCookie('sessionID'); // Optional: Cookie im Browser löschen
+            res.status(200).json({ message: "Abmeldung erfolgreich" });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 
 
 // POST User

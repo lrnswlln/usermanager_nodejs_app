@@ -18,13 +18,17 @@
                     onclick="addRandomUser()">
                 <span class="mx-2">Zufällige Nutzer</span>
             </button>
-            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
+            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="UserdataRender"
                     onclick="renderUserList()">
                 <span class="mx-2">Get API Data</span>
             </button>
             <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
                     onclick="fetchData()">
                 <span class="mx-2">Login Data</span>
+            </button>
+            <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="userLogout"
+                    onclick="userLogout()">
+                <span class="mx-2">Logout</span>
             </button>
 
 
@@ -79,6 +83,10 @@
                     </form>
                 </div>
             </div>
+        </div>
+
+        <div class="user-profile w-100 bg-white border rounded rounded-3 p-5" id="user-profile">
+
         </div>
 
 

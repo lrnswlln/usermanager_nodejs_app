@@ -10,17 +10,33 @@ class UserObject {
 
 
 
+interface UserData {
+    firstname: string;
+    lastname: string;
+    mail: string;
+}
 
-async function fetchUserProfile(): Promise<any> {
+interface PetData {
+    id: number;
+    name: string;
+    kind: string;
+    userId: string;
+}
+
+async function fetchUserProfile(): Promise<UserData> {
     try {
         const response = await fetch('/user/profile', {
             method: 'GET',
-            credentials: 'include' // Sendet Cookies mit der Anfrage
+            credentials: 'include'
         });
         if (!response.ok) {
             throw new Error('Fehler beim Abrufen der Benutzerdaten');
         }
-        const userData = await response.json();
+        const userDataArray: UserData[] = await response.json();
+        if (userDataArray.length === 0) {
+            throw new Error('Keine Benutzerdaten erhalten');
+        }
+        const userData: UserData = userDataArray[0];
         return userData;
     } catch (error) {
         console.error('Fehler beim Abrufen der Benutzerdaten:', error.message);
@@ -28,23 +44,87 @@ async function fetchUserProfile(): Promise<any> {
     }
 }
 
-async function fetchUserPets(): Promise<any> {
+async function fetchUserPets(): Promise<PetData[]> {
     try {
         const response = await fetch('/user/pets', {
             method: 'GET',
-            credentials: 'include' // Sendet Cookies mit der Anfrage
+            credentials: 'include'
         });
         if (!response.ok) {
             throw new Error('Fehler beim Abrufen der Haustiere');
         }
-        const userPets = await response.json();
+        const userPets: PetData[] = await response.json();
         return userPets;
     } catch (error) {
         console.error('Fehler beim Abrufen der Haustiere:', error.message);
         throw error;
     }
-
 }
+
+async function renderUserProfile() {
+    try {
+        const userData: UserData = await fetchUserProfile();
+        const userPets: PetData[] = await fetchUserPets();
+
+        console.log("test" + userData);
+
+        const userProfileDiv: HTMLElement | null = document.getElementById('user-profile');
+        if (!userProfileDiv) return;
+
+        userProfileDiv.innerHTML = '';
+
+        const userContainer: HTMLDivElement = document.createElement('div');
+        userContainer.innerHTML = `
+            <h2>User Profile</h2>
+            <p>First Name: ${userData.firstname}</p>
+            <p>Last Name: ${userData.lastname}</p>
+            <p>Email: ${userData.mail}</p>
+        `;
+        userProfileDiv.appendChild(userContainer);
+
+        if (userPets.length > 0) {
+            const petsContainer: HTMLDivElement = document.createElement('div');
+            petsContainer.innerHTML = '<h3>Pets</h3>';
+            const petsList: HTMLUListElement = document.createElement('ul');
+            userPets.forEach((pet: PetData) => {
+                const petItem: HTMLLIElement = document.createElement('li');
+                petItem.textContent = `${pet.name} - ${pet.kind}`;
+                petsList.appendChild(petItem);
+            });
+            petsContainer.appendChild(petsList);
+            userProfileDiv.appendChild(petsContainer);
+        }
+    } catch (error) {
+        console.error('Error rendering user profile:', error.message);
+    }
+}
+
+renderUserProfile();
+
+async function userLogout(): Promise<void> {
+
+    const userProfile: HTMLElement | null = document.getElementById('user-profile');
+
+    try {
+        const response = await fetch('/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            userProfile.innerHTML = "";
+            console.log('Abmeldung erfolgreich');
+        } else {
+            console.error('Fehler beim Abmelden:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Fehler beim Abmelden:', error.message);
+    }
+}
+
 
 // Beispiel für die Verwendung der Funktionen
 async function fetchData() {

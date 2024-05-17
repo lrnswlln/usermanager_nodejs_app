@@ -46,14 +46,14 @@ var UserObject = /** @class */ (function () {
 }());
 function fetchUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, userData, error_1;
+        var response, userDataArray, userData, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 3, , 4]);
                     return [4 /*yield*/, fetch('/user/profile', {
                             method: 'GET',
-                            credentials: 'include' // Sendet Cookies mit der Anfrage
+                            credentials: 'include'
                         })];
                 case 1:
                     response = _a.sent();
@@ -62,7 +62,11 @@ function fetchUserProfile() {
                     }
                     return [4 /*yield*/, response.json()];
                 case 2:
-                    userData = _a.sent();
+                    userDataArray = _a.sent();
+                    if (userDataArray.length === 0) {
+                        throw new Error('Keine Benutzerdaten erhalten');
+                    }
+                    userData = userDataArray[0];
                     return [2 /*return*/, userData];
                 case 3:
                     error_1 = _a.sent();
@@ -82,7 +86,7 @@ function fetchUserPets() {
                     _a.trys.push([0, 3, , 4]);
                     return [4 /*yield*/, fetch('/user/pets', {
                             method: 'GET',
-                            credentials: 'include' // Sendet Cookies mit der Anfrage
+                            credentials: 'include'
                         })];
                 case 1:
                     response = _a.sent();
@@ -102,10 +106,90 @@ function fetchUserPets() {
         });
     });
 }
+function renderUserProfile() {
+    return __awaiter(this, void 0, void 0, function () {
+        var userData, userPets, userProfileDiv, userContainer, petsContainer, petsList_1, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetchUserProfile()];
+                case 1:
+                    userData = _a.sent();
+                    return [4 /*yield*/, fetchUserPets()];
+                case 2:
+                    userPets = _a.sent();
+                    console.log("test" + userData);
+                    userProfileDiv = document.getElementById('user-profile');
+                    if (!userProfileDiv)
+                        return [2 /*return*/];
+                    userProfileDiv.innerHTML = '';
+                    userContainer = document.createElement('div');
+                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n        ");
+                    userProfileDiv.appendChild(userContainer);
+                    if (userPets.length > 0) {
+                        petsContainer = document.createElement('div');
+                        petsContainer.innerHTML = '<h3>Pets</h3>';
+                        petsList_1 = document.createElement('ul');
+                        userPets.forEach(function (pet) {
+                            var petItem = document.createElement('li');
+                            petItem.textContent = "".concat(pet.name, " - ").concat(pet.kind);
+                            petsList_1.appendChild(petItem);
+                        });
+                        petsContainer.appendChild(petsList_1);
+                        userProfileDiv.appendChild(petsContainer);
+                    }
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_3 = _a.sent();
+                    console.error('Error rendering user profile:', error_3.message);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+renderUserProfile();
+function userLogout() {
+    return __awaiter(this, void 0, void 0, function () {
+        var userProfile, response, error_4;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    userProfile = document.getElementById('user-profile');
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, fetch('/logout', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })];
+                case 2:
+                    response = _a.sent();
+                    if (response.ok) {
+                        userProfile.innerHTML = "";
+                        console.log('Abmeldung erfolgreich');
+                    }
+                    else {
+                        console.error('Fehler beim Abmelden:', response.statusText);
+                    }
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_4 = _a.sent();
+                    console.error('Fehler beim Abmelden:', error_4.message);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 // Beispiel für die Verwendung der Funktionen
 function fetchData() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, userPets, error_3;
+        var userProfile, userPets, error_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -120,8 +204,8 @@ function fetchData() {
                     console.log('Haustiere des Benutzers:', userPets);
                     return [3 /*break*/, 4];
                 case 3:
-                    error_3 = _a.sent();
-                    console.error('Fehler beim Abrufen der Daten:', error_3.message);
+                    error_5 = _a.sent();
+                    console.error('Fehler beim Abrufen der Daten:', error_5.message);
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
