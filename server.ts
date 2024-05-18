@@ -35,9 +35,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // Gültigkeitsdauer des Session-Cookies (hier: 1 Tag)
-        secure: false, // Setze auf 'true', wenn du HTTPS verwendest
-        httpOnly: true // Session-Cookie kann nur über HTTP übertragen werden, nicht über JavaScript
+        maxAge: 1000 * 60 * 60 * 24,
+        secure: false,
+        httpOnly: true
     }
 }));
 
@@ -205,6 +205,59 @@ app.get('/users/:userId', async (req: express.Request, res: express.Response) =>
         res.status(500).json({error: error.message});
     }
 });
+
+
+
+
+
+app.patch('/user/update', async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string | undefined = req.session?.userId;
+
+        if (!userId) {
+            throw new Error('Benutzer nicht authentifiziert');
+        }
+
+        const { firstname, lastname, mail, password } = req.body;
+
+        let updateQuery = 'UPDATE Users SET';
+        const updateUserValues = [];
+
+        if (firstname) {
+            updateQuery += ' firstname = ?,';
+            updateUserValues.push(firstname);
+        }
+        if (lastname) {
+            updateQuery += ' lastname = ?,';
+            updateUserValues.push(lastname);
+        }
+        if (mail) {
+            updateQuery += ' mail = ?,';
+            updateUserValues.push(mail);
+        }
+        if (password) {
+            updateQuery += ' password = ?,';
+            updateUserValues.push(password);
+        }
+
+        // Entferne das letzte Komma
+        updateQuery = updateQuery.slice(0, -1);
+
+        updateQuery += ' WHERE id = ?';
+        updateUserValues.push(userId);
+
+        await (await connection).query(updateQuery, updateUserValues);
+
+        res.status(200).json({ message: 'Benutzer aktualisiert' });
+    } catch (error) {
+        console.error('Fehler beim Aktualisieren des Benutzers:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+
 
 
 // PATCH User

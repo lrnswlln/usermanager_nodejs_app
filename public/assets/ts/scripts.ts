@@ -62,6 +62,8 @@ async function fetchUserPets(): Promise<PetData[]> {
 }
 
 async function renderUserProfile() {
+    const userProfile: HTMLElement | null = document.getElementById('user-profile');
+    userProfile.innerHTML = "";
     try {
         const userData: UserData = await fetchUserProfile();
         const userPets: PetData[] = await fetchUserPets();
@@ -278,7 +280,7 @@ async function loginUser() {
         credentials: "include"
     });
     if (response.ok) {
-
+        renderUserProfile();
         emailLoginInput.value = "";
         passwordLoginInput.value = "";
 
@@ -493,6 +495,92 @@ async function editUserCloud(id: string) {
         console.log("Error: Response is not OK", response.statusText);
     }
 }
+
+
+
+async function editUserModal() {
+    try {
+        const response: Response = await fetch('/user/profile', {
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            const editUser = await response.json();
+
+            console.log(editUser);
+
+            const editFirstName = document.getElementById("editFirstName") as HTMLInputElement;
+            const editLastName = document.getElementById("editLastName") as HTMLInputElement;
+            const editEmail = document.getElementById("editEmail") as HTMLInputElement;
+
+            if (editFirstName && editLastName && editEmail) {
+                // Setze Userdaten in die Inputfelder
+                editFirstName.value = editUser[0].firstname;
+                editLastName.value = editUser[0].lastname;
+                editEmail.value = editUser[0].mail;
+
+                const button = document.getElementById('updateUser') as HTMLButtonElement;
+                if (button) {
+                    button.setAttribute('onclick', `updateUserCloud('${editUser[0].id}')`);
+                }
+
+                // Öffne das Bootstrap 5 Modal für die Bearbeitung
+                const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
+                editModal.show();
+            }
+        } else {
+            console.error("Error: Response is not OK", response.statusText);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+
+// Update USer
+async function updateUser(): Promise<void> {
+    try {
+        // Input Felder für Bearbeitung
+        const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
+        const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
+
+        // Trimmen der Werte
+        const editFirstName = editFirstNameInput.value.trim();
+        const editLastName = editLastNameInput.value.trim();
+
+        // Überprüft, ob ein User bearbeitet wird
+        if (editFirstName && editLastName) {
+            // Aktualisiert die Daten des ausgewählten Users
+            const response = await fetch(`/user/update`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    firstname: editFirstName,
+                    lastname: editLastName
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error('Fehler beim Aktualisieren des Benutzers');
+            }
+
+            // Versteckt das Modal nach Bearbeitung
+            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
+            editModal.hide();
+
+            await renderUserProfile();
+        } else {
+            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+        }
+    } catch (error) {
+        console.error('Fehler beim Aktualisieren des Benutzers:', error.message);
+        // Hier kannst du Fehlerhandhabung hinzufügen, falls erforderlich
+    }
+}
+
 
 async function updateUserCloud(id: string) {
 

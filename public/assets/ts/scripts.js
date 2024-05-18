@@ -108,16 +108,20 @@ function fetchUserPets() {
 }
 function renderUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
-        var userData, userPets, userProfileDiv, userContainer, petsContainer, petsList_1, error_3;
+        var userProfile, userData, userPets, userProfileDiv, userContainer, petsContainer, petsList_1, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetchUserProfile()];
+                    userProfile = document.getElementById('user-profile');
+                    userProfile.innerHTML = "";
+                    _a.label = 1;
                 case 1:
+                    _a.trys.push([1, 4, , 5]);
+                    return [4 /*yield*/, fetchUserProfile()];
+                case 2:
                     userData = _a.sent();
                     return [4 /*yield*/, fetchUserPets()];
-                case 2:
+                case 3:
                     userPets = _a.sent();
                     console.log("test" + userData);
                     userProfileDiv = document.getElementById('user-profile');
@@ -139,12 +143,12 @@ function renderUserProfile() {
                         petsContainer.appendChild(petsList_1);
                         userProfileDiv.appendChild(petsContainer);
                     }
-                    return [3 /*break*/, 4];
-                case 3:
+                    return [3 /*break*/, 5];
+                case 4:
                     error_3 = _a.sent();
                     console.error('Error rendering user profile:', error_3.message);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
+                    return [3 /*break*/, 5];
+                case 5: return [2 /*return*/];
             }
         });
     });
@@ -376,6 +380,7 @@ function loginUser() {
                 case 1:
                     response = _a.sent();
                     if (!response.ok) return [3 /*break*/, 2];
+                    renderUserProfile();
                     emailLoginInput.value = "";
                     passwordLoginInput.value = "";
                     console.log("login successfully!");
@@ -632,6 +637,100 @@ function editUserCloud(id) {
                     console.log("Error: Response is not OK", response.statusText);
                     _a.label = 4;
                 case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+function editUserModal() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, editUser, editFirstName, editLastName, editEmail, button, editModal, error_6;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    return [4 /*yield*/, fetch('/user/profile', {
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) return [3 /*break*/, 3];
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    editUser = _a.sent();
+                    console.log(editUser);
+                    editFirstName = document.getElementById("editFirstName");
+                    editLastName = document.getElementById("editLastName");
+                    editEmail = document.getElementById("editEmail");
+                    if (editFirstName && editLastName && editEmail) {
+                        // Setze Userdaten in die Inputfelder
+                        editFirstName.value = editUser[0].firstname;
+                        editLastName.value = editUser[0].lastname;
+                        editEmail.value = editUser[0].mail;
+                        button = document.getElementById('updateUser');
+                        if (button) {
+                            button.setAttribute('onclick', "updateUserCloud('".concat(editUser[0].id, "')"));
+                        }
+                        editModal = new bootstrap.Modal(document.getElementById("editModal"));
+                        editModal.show();
+                    }
+                    return [3 /*break*/, 4];
+                case 3:
+                    console.error("Error: Response is not OK", response.statusText);
+                    _a.label = 4;
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    error_6 = _a.sent();
+                    console.error("Error:", error_6);
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+// Update USer
+function updateUser() {
+    return __awaiter(this, void 0, void 0, function () {
+        var editFirstNameInput, editLastNameInput, editFirstName, editLastName, response, editModal, error_7;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    editFirstNameInput = document.getElementById("editFirstName");
+                    editLastNameInput = document.getElementById("editLastName");
+                    editFirstName = editFirstNameInput.value.trim();
+                    editLastName = editLastNameInput.value.trim();
+                    if (!(editFirstName && editLastName)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, fetch("/user/update", {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                firstname: editFirstName,
+                                lastname: editLastName
+                            }),
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            credentials: "include"
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!response.ok) {
+                        throw new Error('Fehler beim Aktualisieren des Benutzers');
+                    }
+                    editModal = new bootstrap.Modal(document.getElementById("editModal"));
+                    editModal.hide();
+                    return [4 /*yield*/, renderUserProfile()];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+                    _a.label = 4;
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    error_7 = _a.sent();
+                    console.error('Fehler beim Aktualisieren des Benutzers:', error_7.message);
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
             }
         });
     });
