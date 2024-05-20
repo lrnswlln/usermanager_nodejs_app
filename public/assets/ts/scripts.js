@@ -129,7 +129,7 @@ function renderUserProfile() {
                         return [2 /*return*/];
                     userProfileDiv.innerHTML = '';
                     userContainer = document.createElement('div');
-                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n        ");
+                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n                        <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\" id=\"editUserModal\"\n                    onclick=\"petAdmin()\">\n                <span class=\"mx-2\">Tiere verwalten</span>\n            </button>\n        ");
                     userProfileDiv.appendChild(userContainer);
                     if (userPets.length > 0) {
                         petsContainer = document.createElement('div');
@@ -279,7 +279,7 @@ function addRandomUser() {
     });
 }
 // @ts-ignore
-function addUserPet(userId) {
+function addUserPet() {
     return __awaiter(this, void 0, void 0, function () {
         var petName, petKind, name, kind, response;
         return __generator(this, function (_a) {
@@ -289,12 +289,9 @@ function addUserPet(userId) {
                     petKind = document.getElementById("petKind");
                     name = petName.value.trim();
                     kind = petKind.value.trim();
-                    return [4 /*yield*/, fetch("/users/".concat(userId, "/pets"), {
+                    return [4 /*yield*/, fetch('/user/pets', {
                             method: "POST",
-                            body: JSON.stringify({
-                                name: name,
-                                kind: kind
-                            }),
+                            body: JSON.stringify({ name: name, kind: kind }),
                             headers: {
                                 "Content-Type": "application/json"
                             },
@@ -307,7 +304,7 @@ function addUserPet(userId) {
                     return [4 /*yield*/, renderUserList()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, renderUserPetListAdmin(userId)];
+                    return [4 /*yield*/, renderUserPetListAdmin()];
                 case 3:
                     _a.sent();
                     petName.value = "";
@@ -321,8 +318,7 @@ function addUserPet(userId) {
         });
     });
 }
-// @ts-ignore
-function deleteUserPet(userId, petId) {
+function deleteUserPet(petId) {
     return __awaiter(this, void 0, void 0, function () {
         var result, response;
         return __generator(this, function (_a) {
@@ -330,14 +326,14 @@ function deleteUserPet(userId, petId) {
                 case 0:
                     result = window.confirm("Möchten Sie das Element wirklich löschen?");
                     if (!result) return [3 /*break*/, 6];
-                    return [4 /*yield*/, fetch("/users/".concat(userId, "/pets/").concat(petId), {
+                    return [4 /*yield*/, fetch("/user/pets/".concat(petId), {
                             method: "DELETE",
                             credentials: "include"
                         })];
                 case 1:
                     response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 4];
-                    return [4 /*yield*/, renderUserPetListAdmin(userId)];
+                    if (!response.ok) return [3 /*break*/, 4];
+                    return [4 /*yield*/, renderUserPetListAdmin()];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, renderUserList()];
@@ -345,10 +341,10 @@ function deleteUserPet(userId, petId) {
                     _a.sent();
                     return [3 /*break*/, 5];
                 case 4:
-                    console.log("Error: Response is not OK", response.statusText);
+                    console.error("Error: Response is not OK", response.statusText);
                     _a.label = 5;
                 case 5:
-                    console.log("Nutzer Gelöscht!");
+                    console.log("Haustier gelöscht!");
                     _a.label = 6;
                 case 6: return [2 /*return*/];
             }
@@ -542,7 +538,7 @@ function renderUserPetMain(id) {
         });
     });
 }
-function petAdmin(userId) {
+function petAdmin() {
     var petFooterModal = document.getElementById("petModalFooter");
     if (petFooterModal) {
         // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden
@@ -553,23 +549,23 @@ function petAdmin(userId) {
         var petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
         petButton.textContent = "Tier Hinzufügen";
-        petButton.addEventListener("click", function () { return addUserPet(userId); });
+        petButton.addEventListener("click", function () { return addUserPet(); });
         petFooterModal.appendChild(petButton);
     }
-    renderUserPetListAdmin(userId);
+    renderUserPetListAdmin();
     // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     var petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal"));
     petAdminModal.show();
 }
 // @ts-ignore
-function renderUserPetListAdmin(userId) {
+function renderUserPetListAdmin() {
     return __awaiter(this, void 0, void 0, function () {
         var tableBody, userPets, _loop_2, _i, userPets_1, pet;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     tableBody = document.getElementById("userPetTableBody");
-                    return [4 /*yield*/, renderUserPetMain(userId)];
+                    return [4 /*yield*/, fetchUserPets()];
                 case 1:
                     userPets = _a.sent();
                     if (userPets) {
@@ -587,7 +583,7 @@ function renderUserPetListAdmin(userId) {
                                 var actionsCell = row.insertCell(2);
                                 var deleteButton = document.createElement("button");
                                 deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                                deleteButton.addEventListener("click", function () { return deleteUserPet(userId, pet.id); });
+                                deleteButton.addEventListener("click", function () { return deleteUserPet(pet.id); });
                                 actionsCell.appendChild(deleteButton);
                             };
                             for (_i = 0, userPets_1 = userPets; _i < userPets_1.length; _i++) {

@@ -258,6 +258,48 @@ app.patch('/user/update', requireAuth, async (req: express.Request, res: express
 });
 
 
+app.post('/user/pets', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+        const { name, kind } = req.body;
+
+        if (!name || !kind) {
+            res.status(400).json({ error: "Alle Felder müssen ausgefüllt sein." });
+            return;
+        }
+
+        const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE id = ?', [userId]);
+        if (!existingUser || existingUser.length === 0) {
+            res.status(404).json({ error: "Benutzer nicht gefunden." });
+            return;
+        }
+
+        const [result]: any[] = await (await connection).query('INSERT INTO Pets (userId, name, kind) VALUES (?, ?, ?)', [userId, name, kind]);
+        const newPet = { id: result.insertId, userId, name, kind };
+        res.status(201).json(newPet);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.delete('/user/pets/:petId', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+        const petId: number = parseInt(req.params.petId);
+
+        const [pet]: any[] = await (await connection).query('SELECT * FROM Pets WHERE id = ? AND userId = ?', [petId, userId]);
+        if (!pet || pet.length === 0) {
+            res.status(404).json({ error: "Haustier nicht gefunden." });
+            return;
+        }
+
+        await (await connection).query('DELETE FROM Pets WHERE id = ?', [petId]);
+        res.status(200).json({ message: "Haustier wurde gelöscht." });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 
@@ -315,6 +357,18 @@ app.delete('/users/:userId', async (req: express.Request, res: express.Response)
 
 // POST Haustier für Benutzer
 
+
+app.get('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.params.userId;
+        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
+        res.status(200).json(userPets);
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+});
+
+
 app.post('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.params.userId;
@@ -338,16 +392,7 @@ app.post('/users/:userId/pets', async (req: express.Request, res: express.Respon
         res.status(500).json({error: error.message});
     }
 });
-// GET Haustiere eines Benutzers
-app.get('/users/:userId/pets', async (req: express.Request, res: express.Response) => {
-    try {
-        const userId: string = req.params.userId;
-        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
-        res.status(200).json(userPets);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-});
+
 
 // DELETE Haustier eines Benutzers
 app.delete('/users/:userId/pets/:petId', async (req: express.Request, res: express.Response) => {

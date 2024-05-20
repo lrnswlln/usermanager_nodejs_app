@@ -81,6 +81,10 @@ async function renderUserProfile() {
             <p>First Name: ${userData.firstname}</p>
             <p>Last Name: ${userData.lastname}</p>
             <p>Email: ${userData.mail}</p>
+                        <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle" id="editUserModal"
+                    onclick="petAdmin()">
+                <span class="mx-2">Tiere verwalten</span>
+            </button>
         `;
         userProfileDiv.appendChild(userContainer);
 
@@ -201,23 +205,16 @@ async function addRandomUser() {
 }
 
 // @ts-ignore
-async function addUserPet(userId: string) {
-
+async function addUserPet() {
     const petName = document.getElementById("petName") as HTMLInputElement;
     const petKind = document.getElementById("petKind") as HTMLInputElement;
-
-
-
 
     const name = petName.value.trim();
     const kind = petKind.value.trim();
 
-    const response = await fetch(`/users/${userId}/pets`, {
+    const response = await fetch('/user/pets', {
         method: "POST",
-        body: JSON.stringify({
-            name: name,
-            kind: kind
-        }),
+        body: JSON.stringify({ name, kind }),
         headers: {
             "Content-Type": "application/json"
         },
@@ -227,36 +224,35 @@ async function addUserPet(userId: string) {
     if (response.ok) {
         console.log("Tier erfolgreich hinzugefügt");
         await renderUserList();
-        await renderUserPetListAdmin(userId);
+        await renderUserPetListAdmin();
 
         petName.value = "";
         petKind.value = "";
-
     } else {
         console.error("Error adding pet:", response.statusText);
     }
 }
 
-// @ts-ignore
-async function deleteUserPet(userId: string, petId: string) {
-
+async function deleteUserPet(petId: string) {
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
     if (result) {
-        const response: Response = await fetch(`/users/${userId}/pets/${petId}`, {
+        const response: Response = await fetch(`/user/pets/${petId}`, {
             method: "DELETE",
             credentials: "include"
         });
-        if (response?.ok) {
 
-            await renderUserPetListAdmin(userId);
+        if (response.ok) {
+            await renderUserPetListAdmin();
             await renderUserList();
         } else {
-            console.log("Error: Response is not OK", response.statusText);
+            console.error("Error: Response is not OK", response.statusText);
         }
-        console.log("Nutzer Gelöscht!");
+
+        console.log("Haustier gelöscht!");
     }
 }
+
 
 // @ts-ignore
 
@@ -402,8 +398,7 @@ async function renderUserPetMain(id: string) {
     return []; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
 }
 
-function petAdmin(userId: string) {
-
+function petAdmin() {
     const petFooterModal = document.getElementById("petModalFooter");
 
     if (petFooterModal) {
@@ -416,29 +411,27 @@ function petAdmin(userId: string) {
         const petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
         petButton.textContent = "Tier Hinzufügen";
-        petButton.addEventListener("click", () => addUserPet(userId));
+        petButton.addEventListener("click", () => addUserPet());
         petFooterModal.appendChild(petButton);
     }
 
-    renderUserPetListAdmin(userId);
+    renderUserPetListAdmin();
     // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     const petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal") as HTMLElement);
     petAdminModal.show();
 }
 
 // @ts-ignore
-async function renderUserPetListAdmin(userId: string) {
+async function renderUserPetListAdmin() {
     const tableBody: HTMLTableElement | null = document.getElementById("userPetTableBody") as HTMLTableElement;
 
-    const userPets = await renderUserPetMain(userId);
+    const userPets = await fetchUserPets();
 
     if (userPets) {
-
         if (tableBody) {
             tableBody.innerHTML = "";
 
             for (const pet of userPets) {
-
                 const row = tableBody.insertRow();
 
                 const emailCell = row.insertCell(0);
@@ -453,9 +446,8 @@ async function renderUserPetListAdmin(userId: string) {
                 const actionsCell = row.insertCell(2);
                 const deleteButton = document.createElement("button");
                 deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                deleteButton.addEventListener("click", () => deleteUserPet(userId, pet.id));
+                deleteButton.addEventListener("click", () => deleteUserPet(pet.id));
                 actionsCell.appendChild(deleteButton);
-
             }
         }
     }
