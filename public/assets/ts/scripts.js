@@ -601,49 +601,47 @@ function renderUserPetListAdmin(userId) {
         });
     });
 }
+/*
 // @ts-ignore
-function editUserCloud(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, editUser, editFirstName, editLastName, editEmail, button, editModal;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("/users/".concat(id), {
-                        credentials: "include"
-                    })];
-                case 1:
-                    response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    editUser = _a.sent();
-                    console.log(editUser);
-                    editFirstName = document.getElementById("editFirstName");
-                    editLastName = document.getElementById("editLastName");
-                    editEmail = document.getElementById("editEmail");
-                    if (editFirstName && editLastName && editEmail) {
-                        // setzt Userdaten in die Inputfelder
-                        editFirstName.value = editUser.firstname;
-                        editLastName.value = editUser.lastname;
-                        editEmail.value = editUser.mail;
-                        button = document.getElementById('updateUser');
-                        if (button) {
-                            button.setAttribute('onclick', "updateUserCloud('".concat(id, "')"));
-                        }
-                        editModal = new bootstrap.Modal(document.getElementById("editModal"));
-                        editModal.show();
-                    }
-                    return [3 /*break*/, 4];
-                case 3:
-                    console.log("Error: Response is not OK", response.statusText);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
+async function editUserCloud(id: string) {
+    const response: Response = await fetch(`/users/${id}`, {
+        credentials: "include"
     });
+    if (response?.ok) {
+        const editUser = await response.json();
+
+        console.log(editUser);
+
+        const editFirstName = document.getElementById("editFirstName") as HTMLInputElement;
+        const editLastName = document.getElementById("editLastName") as HTMLInputElement;
+        const editPassword = document.getElementById("editPassword") as HTMLInputElement;
+        const editEmail = document.getElementById("editEmail") as HTMLInputElement;
+
+        if (editFirstName && editLastName && editEmail) {
+            // setzt Userdaten in die Inputfelder
+            editFirstName.value = editUser.firstname;
+            editLastName.value = editUser.lastname;
+            editPassword.value = editUser.password;
+            editEmail.value = editUser.mail;
+
+            const button = document.getElementById('updateUser') as HTMLButtonElement;
+            if (button) {
+                button.setAttribute('onclick', `updateUserCloud('${id}')`);
+            }
+
+            // Öffnet das Bootstrap 5 Modal für die Bearbeitung
+            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
+            editModal.show();
+        }
+
+    } else {
+        console.log("Error: Response is not OK", response.statusText);
+    }
 }
+*/
 function editUserModal() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, editUser, editFirstName, editLastName, editEmail, button, editModal, error_6;
+        var response, editUser, editFirstName, editLastName, editEmail, editModal, error_6;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -666,10 +664,6 @@ function editUserModal() {
                         editFirstName.value = editUser[0].firstname;
                         editLastName.value = editUser[0].lastname;
                         editEmail.value = editUser[0].mail;
-                        button = document.getElementById('updateUser');
-                        if (button) {
-                            button.setAttribute('onclick', "updateUserCloud('".concat(editUser[0].id, "')"));
-                        }
                         editModal = new bootstrap.Modal(document.getElementById("editModal"));
                         editModal.show();
                     }
@@ -690,21 +684,24 @@ function editUserModal() {
 // Update USer
 function updateUser() {
     return __awaiter(this, void 0, void 0, function () {
-        var editFirstNameInput, editLastNameInput, editFirstName, editLastName, response, editModal, error_7;
+        var editFirstNameInput, editLastNameInput, editPasswordInput, editFirstName, editLastName, editPassword, response, editModal, error_7;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    _a.trys.push([0, 8, , 9]);
                     editFirstNameInput = document.getElementById("editFirstName");
                     editLastNameInput = document.getElementById("editLastName");
+                    editPasswordInput = document.getElementById("editPassword");
                     editFirstName = editFirstNameInput.value.trim();
                     editLastName = editLastNameInput.value.trim();
-                    if (!(editFirstName && editLastName)) return [3 /*break*/, 3];
+                    editPassword = editPasswordInput.value.trim();
+                    if (!(editFirstName && editLastName && editPassword)) return [3 /*break*/, 6];
                     return [4 /*yield*/, fetch("/user/update", {
                             method: "PATCH",
                             body: JSON.stringify({
                                 firstname: editFirstName,
-                                lastname: editLastName
+                                lastname: editLastName,
+                                password: editPassword
                             }),
                             headers: {
                                 "Content-Type": "application/json"
@@ -713,71 +710,78 @@ function updateUser() {
                         })];
                 case 1:
                     response = _a.sent();
-                    if (!response.ok) {
-                        throw new Error('Fehler beim Aktualisieren des Benutzers');
-                    }
+                    if (!!response.ok) return [3 /*break*/, 2];
+                    throw new Error('Fehler beim Aktualisieren des Benutzers');
+                case 2: return [4 /*yield*/, renderUserProfile()];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
                     editModal = new bootstrap.Modal(document.getElementById("editModal"));
                     editModal.hide();
                     return [4 /*yield*/, renderUserProfile()];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
-                    _a.label = 4;
-                case 4: return [3 /*break*/, 6];
                 case 5:
+                    _a.sent();
+                    return [3 /*break*/, 7];
+                case 6:
+                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+                    _a.label = 7;
+                case 7: return [3 /*break*/, 9];
+                case 8:
                     error_7 = _a.sent();
                     console.error('Fehler beim Aktualisieren des Benutzers:', error_7.message);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 9];
+                case 9: return [2 /*return*/];
             }
         });
     });
 }
-function updateUserCloud(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        var editFirstNameInput, editLastNameInput, editFirstName, editLastName, response, editModal, button;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!(id !== null)) return [3 /*break*/, 4];
-                    editFirstNameInput = document.getElementById("editFirstName");
-                    editLastNameInput = document.getElementById("editLastName");
-                    editFirstName = editFirstNameInput.value.trim();
-                    editLastName = editLastNameInput.value.trim();
-                    if (!(editFirstName && editLastName)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, fetch("/users/".concat(id), {
-                            method: "PATCH",
-                            body: JSON.stringify({
-                                firstname: editFirstName,
-                                lastname: editLastName,
-                            }),
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            credentials: "include"
-                        })];
-                case 1:
-                    response = _a.sent();
-                    editModal = new bootstrap.Modal(document.getElementById("editModal"));
-                    editModal.hide();
-                    button = document.getElementById('updateUser');
-                    if (button) {
-                        button.setAttribute('onclick', "updateUserCloud(".concat(null, ")"));
-                    }
-                    return [4 /*yield*/, renderUserList()];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+/*
+async function updateUserCloud(id: string) {
+
+    // Überprüft, ob ein User bearbeitet wird
+    if (id !== null) {
+        // Input Felder für Bearbeitung
+        const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
+        const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
+
+        // Trimmen der Werte
+        const editFirstName = editFirstNameInput.value.trim();
+        const editLastName = editLastNameInput.value.trim();
+
+        // Checken, ob die Eingabefelder alle gefüllt sind
+        if (editFirstName && editLastName) {
+            // Aktualisiert die Daten des ausgewählten Users
+
+            const response: Response = await fetch(`/users/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    firstname: editFirstName,
+                    lastname: editLastName,
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include"
+            });
+
+            // Versteckt das Modal nach Bearbeitung
+            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
+            editModal.hide();
+
+
+            const button = document.getElementById('updateUser') as HTMLButtonElement;
+            if (button) {
+                button.setAttribute('onclick', `updateUserCloud(${null})`);
             }
-        });
-    });
+
+            await renderUserList()
+        } else {
+            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+        }
+    }
 }
+*/
 // @ts-ignore
 function deleteUserCloud(id) {
     return __awaiter(this, void 0, void 0, function () {

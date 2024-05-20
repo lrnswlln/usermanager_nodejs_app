@@ -210,7 +210,7 @@ app.get('/users/:userId', async (req: express.Request, res: express.Response) =>
 
 
 
-app.patch('/user/update', async (req: express.Request, res: express.Response) => {
+app.patch('/user/update', requireAuth, async (req: express.Request, res: express.Response) => {
     try {
         const userId: string | undefined = req.session?.userId;
 
@@ -240,8 +240,10 @@ app.patch('/user/update', async (req: express.Request, res: express.Response) =>
             updateUserValues.push(password);
         }
 
-        // Entferne das letzte Komma
-        updateQuery = updateQuery.slice(0, -1);
+        // Entfernt das letzte Komma
+        if (updateUserValues.length > 0) {
+            updateQuery = updateQuery.slice(0, -1);
+        }
 
         updateQuery += ' WHERE id = ?';
         updateUserValues.push(userId);

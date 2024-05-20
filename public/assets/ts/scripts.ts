@@ -461,6 +461,7 @@ async function renderUserPetListAdmin(userId: string) {
     }
 }
 
+/*
 // @ts-ignore
 async function editUserCloud(id: string) {
     const response: Response = await fetch(`/users/${id}`, {
@@ -473,12 +474,14 @@ async function editUserCloud(id: string) {
 
         const editFirstName = document.getElementById("editFirstName") as HTMLInputElement;
         const editLastName = document.getElementById("editLastName") as HTMLInputElement;
+        const editPassword = document.getElementById("editPassword") as HTMLInputElement;
         const editEmail = document.getElementById("editEmail") as HTMLInputElement;
 
         if (editFirstName && editLastName && editEmail) {
             // setzt Userdaten in die Inputfelder
             editFirstName.value = editUser.firstname;
             editLastName.value = editUser.lastname;
+            editPassword.value = editUser.password;
             editEmail.value = editUser.mail;
 
             const button = document.getElementById('updateUser') as HTMLButtonElement;
@@ -495,7 +498,7 @@ async function editUserCloud(id: string) {
         console.log("Error: Response is not OK", response.statusText);
     }
 }
-
+*/
 
 
 async function editUserModal() {
@@ -519,10 +522,6 @@ async function editUserModal() {
                 editLastName.value = editUser[0].lastname;
                 editEmail.value = editUser[0].mail;
 
-                const button = document.getElementById('updateUser') as HTMLButtonElement;
-                if (button) {
-                    button.setAttribute('onclick', `updateUserCloud('${editUser[0].id}')`);
-                }
 
                 // Öffne das Bootstrap 5 Modal für die Bearbeitung
                 const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
@@ -543,19 +542,22 @@ async function updateUser(): Promise<void> {
         // Input Felder für Bearbeitung
         const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
         const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
+        const editPasswordInput = document.getElementById("editPassword") as HTMLInputElement;
 
         // Trimmen der Werte
         const editFirstName = editFirstNameInput.value.trim();
         const editLastName = editLastNameInput.value.trim();
+        const editPassword = editPasswordInput.value.trim();
 
         // Überprüft, ob ein User bearbeitet wird
-        if (editFirstName && editLastName) {
+        if (editFirstName && editLastName && editPassword) {
             // Aktualisiert die Daten des ausgewählten Users
             const response = await fetch(`/user/update`, {
                 method: "PATCH",
                 body: JSON.stringify({
                     firstname: editFirstName,
-                    lastname: editLastName
+                    lastname: editLastName,
+                    password: editPassword
                 }),
                 headers: {
                     "Content-Type": "application/json"
@@ -565,6 +567,9 @@ async function updateUser(): Promise<void> {
 
             if (!response.ok) {
                 throw new Error('Fehler beim Aktualisieren des Benutzers');
+
+            } else {
+                await renderUserProfile();
             }
 
             // Versteckt das Modal nach Bearbeitung
@@ -581,7 +586,7 @@ async function updateUser(): Promise<void> {
     }
 }
 
-
+/*
 async function updateUserCloud(id: string) {
 
     // Überprüft, ob ein User bearbeitet wird
@@ -626,6 +631,7 @@ async function updateUserCloud(id: string) {
         }
     }
 }
+*/
 
 // @ts-ignore
 async function deleteUserCloud(id: string) {
@@ -646,6 +652,8 @@ async function deleteUserCloud(id: string) {
         console.log("Nutzer Gelöscht!");
     }
 }
+
+
 
 function scrollDown() {
     //this.scroller.scrollToAnchor("targetGreen");
