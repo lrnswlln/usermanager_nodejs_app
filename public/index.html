@@ -73,11 +73,13 @@
                     <h2 class="w-100 text-center text-white py-3">Einloggen</h2>
                     <form id="formLogin">
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="emailLogin" placeholder="name@example.com" required type="email">
+                            <input class="form-control" id="emailLogin" placeholder="name@example.com" required
+                                   type="email">
                             <label for="emailLogin">E-Mail Adresse</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="passwordLogin" placeholder="Passwort" required type="password">
+                            <input class="form-control" id="passwordLogin" placeholder="Passwort" required
+                                   type="password">
                             <label for="passwordLogin">Passwort</label>
                         </div>
 
@@ -89,28 +91,29 @@
             </div>
         </div>
 
-        <div class="user-profile w-100 bg-white border rounded rounded-3 p-5" id="user-profile">
+        <div class="user-profile w-100 bg-white border rounded rounded-3 p-5">
+            <div class="user-profile-data" id="user-profile"></div>
+            <div class="display-user-pets" id="userPetList">
+                <h2 class="w-100 text-center text-white py-3">User Tiere</h2>
+                <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle"
+                        onclick="petAdmin()">
+                    <span class="mx-2">Tiere verwalten</span>
+                </button>
 
+                <table class="table table-hover align-middle table-responsive border rounded rounded-3 overflow-hidden">
+                    <thead>
+                    <tr>
+                        <th class="py-3" scope="col">Name</th>
+                        <th class="py-3" scope="col">Tierart</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-group-divider" id="userTableBody">
+                    <!-- Die User werden via for-each Loop über TS eingefügt -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-
-        <div class="display-users" id="userList">
-            <h2 class="w-100 text-center text-white py-3">Benutzer Liste</h2>
-            <table class="table table-hover align-middle table-responsive border rounded rounded-3 overflow-hidden">
-                <thead>
-                <tr>
-                    <th class="py-3" scope="col">E-Mail</th>
-                    <th class="py-3" scope="col">Nachname</th>
-                    <th class="py-3" scope="col">Vorname</th>
-                    <th class="py-3" scope="col">Tiere</th>
-                    <th class="py-3" scope="col">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="table-group-divider" id="userTableBody">
-                <!-- Die User werden via for-each Loop über TS eingefügt -->
-                </tbody>
-            </table>
-        </div>
 
         <div class="modal" id="editModal" tabindex="-1">
             <div class="modal-dialog">

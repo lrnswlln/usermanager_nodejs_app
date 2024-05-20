@@ -44,9 +44,45 @@ var UserObject = /** @class */ (function () {
     }
     return UserObject;
 }());
+function deleteUser() {
+    return __awaiter(this, void 0, void 0, function () {
+        var response, errorData, responseData, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
+                    return [4 /*yield*/, fetch('/user/delete', {
+                            method: 'DELETE',
+                            credentials: 'include'
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (!!response.ok) return [3 /*break*/, 3];
+                    return [4 /*yield*/, response.json()];
+                case 2:
+                    errorData = _a.sent();
+                    console.error('Fehler beim Löschen des Benutzers:', errorData.error);
+                    alert('Fehler beim Löschen des Benutzers: ' + errorData.error);
+                    return [2 /*return*/];
+                case 3: return [4 /*yield*/, response.json()];
+                case 4:
+                    responseData = _a.sent();
+                    console.log(responseData.message);
+                    window.location.reload();
+                    return [3 /*break*/, 6];
+                case 5:
+                    error_1 = _a.sent();
+                    console.error('Unbekannter Fehler:', error_1);
+                    alert('Ein unbekannter Fehler ist aufgetreten.');
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
 function fetchUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, userDataArray, userData, error_1;
+        var response, userDataArray, userData, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -69,9 +105,9 @@ function fetchUserProfile() {
                     userData = userDataArray[0];
                     return [2 /*return*/, userData];
                 case 3:
-                    error_1 = _a.sent();
-                    console.error('Fehler beim Abrufen der Benutzerdaten:', error_1.message);
-                    throw error_1;
+                    error_2 = _a.sent();
+                    console.error('Fehler beim Abrufen der Benutzerdaten:', error_2.message);
+                    throw error_2;
                 case 4: return [2 /*return*/];
             }
         });
@@ -79,7 +115,7 @@ function fetchUserProfile() {
 }
 function fetchUserPets() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, userPets, error_2;
+        var response, userPets, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -98,9 +134,9 @@ function fetchUserPets() {
                     userPets = _a.sent();
                     return [2 /*return*/, userPets];
                 case 3:
-                    error_2 = _a.sent();
-                    console.error('Fehler beim Abrufen der Haustiere:', error_2.message);
-                    throw error_2;
+                    error_3 = _a.sent();
+                    console.error('Fehler beim Abrufen der Haustiere:', error_3.message);
+                    throw error_3;
                 case 4: return [2 /*return*/];
             }
         });
@@ -108,12 +144,13 @@ function fetchUserPets() {
 }
 function renderUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, userData, userPets, userProfileDiv, userContainer, petsContainer, petsList_1, error_3;
+        var userProfile, userData, userPets, userProfileDiv, userContainer, userTableBody_1, error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     userProfile = document.getElementById('user-profile');
-                    userProfile.innerHTML = "";
+                    if (userProfile)
+                        userProfile.innerHTML = "";
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 4, , 5]);
@@ -129,24 +166,21 @@ function renderUserProfile() {
                         return [2 /*return*/];
                     userProfileDiv.innerHTML = '';
                     userContainer = document.createElement('div');
-                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n                        <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\" id=\"editUserModal\"\n                    onclick=\"petAdmin()\">\n                <span class=\"mx-2\">Tiere verwalten</span>\n            </button>\n        ");
+                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n            \n                            <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\"\n                        onclick=\"deleteUser()\">\n                    <span class=\"mx-2\">Nutzer L\u00F6schen</span>\n                </button>\n\n        ");
                     userProfileDiv.appendChild(userContainer);
-                    if (userPets.length > 0) {
-                        petsContainer = document.createElement('div');
-                        petsContainer.innerHTML = '<h3>Pets</h3>';
-                        petsList_1 = document.createElement('ul');
+                    userTableBody_1 = document.getElementById('userTableBody');
+                    if (userTableBody_1) {
+                        userTableBody_1.innerHTML = '';
                         userPets.forEach(function (pet) {
-                            var petItem = document.createElement('li');
-                            petItem.textContent = "".concat(pet.name, " - ").concat(pet.kind);
-                            petsList_1.appendChild(petItem);
+                            var petRow = document.createElement('tr');
+                            petRow.innerHTML = "\n                    <td>".concat(pet.name, "</td>\n                    <td>").concat(pet.kind, "</td>\n                ");
+                            userTableBody_1.appendChild(petRow);
                         });
-                        petsContainer.appendChild(petsList_1);
-                        userProfileDiv.appendChild(petsContainer);
                     }
                     return [3 /*break*/, 5];
                 case 4:
-                    error_3 = _a.sent();
-                    console.error('Error rendering user profile:', error_3.message);
+                    error_4 = _a.sent();
+                    console.error('Error rendering user profile:', error_4.message);
                     return [3 /*break*/, 5];
                 case 5: return [2 /*return*/];
             }
@@ -156,7 +190,7 @@ function renderUserProfile() {
 renderUserProfile();
 function userLogout() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, response, error_4;
+        var userProfile, response, error_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -182,8 +216,8 @@ function userLogout() {
                     }
                     return [3 /*break*/, 4];
                 case 3:
-                    error_4 = _a.sent();
-                    console.error('Fehler beim Abmelden:', error_4.message);
+                    error_5 = _a.sent();
+                    console.error('Fehler beim Abmelden:', error_5.message);
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
@@ -193,7 +227,7 @@ function userLogout() {
 // Beispiel für die Verwendung der Funktionen
 function fetchData() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, userPets, error_5;
+        var userProfile, userPets, error_6;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -208,8 +242,8 @@ function fetchData() {
                     console.log('Haustiere des Benutzers:', userPets);
                     return [3 /*break*/, 4];
                 case 3:
-                    error_5 = _a.sent();
-                    console.error('Fehler beim Abrufen der Daten:', error_5.message);
+                    error_6 = _a.sent();
+                    console.error('Fehler beim Abrufen der Daten:', error_6.message);
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
             }
@@ -637,7 +671,7 @@ async function editUserCloud(id: string) {
 */
 function editUserModal() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, editUser, editFirstName, editLastName, editEmail, editModal, error_6;
+        var response, editUser, editFirstName, editLastName, editEmail, editModal, error_7;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -669,8 +703,8 @@ function editUserModal() {
                     _a.label = 4;
                 case 4: return [3 /*break*/, 6];
                 case 5:
-                    error_6 = _a.sent();
-                    console.error("Error:", error_6);
+                    error_7 = _a.sent();
+                    console.error("Error:", error_7);
                     return [3 /*break*/, 6];
                 case 6: return [2 /*return*/];
             }
@@ -680,7 +714,7 @@ function editUserModal() {
 // Update USer
 function updateUser() {
     return __awaiter(this, void 0, void 0, function () {
-        var editFirstNameInput, editLastNameInput, editPasswordInput, editFirstName, editLastName, editPassword, response, editModal, error_7;
+        var editFirstNameInput, editLastNameInput, editPasswordInput, editFirstName, editLastName, editPassword, response, editModal, error_8;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -724,8 +758,8 @@ function updateUser() {
                     _a.label = 7;
                 case 7: return [3 /*break*/, 9];
                 case 8:
-                    error_7 = _a.sent();
-                    console.error('Fehler beim Aktualisieren des Benutzers:', error_7.message);
+                    error_8 = _a.sent();
+                    console.error('Fehler beim Aktualisieren des Benutzers:', error_8.message);
                     return [3 /*break*/, 9];
                 case 9: return [2 /*return*/];
             }

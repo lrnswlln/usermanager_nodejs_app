@@ -5,9 +5,9 @@ class UserObject {
         public lastname: string,
         public mail: string,
         public password: string
-    ) {}
+    ) {
+    }
 }
-
 
 
 interface UserData {
@@ -21,6 +21,29 @@ interface PetData {
     name: string;
     kind: string;
     userId: string;
+}
+
+async function deleteUser(): Promise<void> {
+    try {
+        const response = await fetch('/user/delete', {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Fehler beim Löschen des Benutzers:', errorData.error);
+            alert('Fehler beim Löschen des Benutzers: ' + errorData.error);
+            return;
+        }
+
+        const responseData = await response.json();
+        console.log(responseData.message);
+        window.location.reload();
+    } catch (error) {
+        console.error('Unbekannter Fehler:', error);
+        alert('Ein unbekannter Fehler ist aufgetreten.');
+    }
 }
 
 async function fetchUserProfile(): Promise<UserData> {
@@ -63,7 +86,8 @@ async function fetchUserPets(): Promise<PetData[]> {
 
 async function renderUserProfile() {
     const userProfile: HTMLElement | null = document.getElementById('user-profile');
-    userProfile.innerHTML = "";
+    if (userProfile) userProfile.innerHTML = "";
+
     try {
         const userData: UserData = await fetchUserProfile();
         const userPets: PetData[] = await fetchUserPets();
@@ -81,24 +105,26 @@ async function renderUserProfile() {
             <p>First Name: ${userData.firstname}</p>
             <p>Last Name: ${userData.lastname}</p>
             <p>Email: ${userData.mail}</p>
-                        <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle" id="editUserModal"
-                    onclick="petAdmin()">
-                <span class="mx-2">Tiere verwalten</span>
-            </button>
+            
+                            <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle"
+                        onclick="deleteUser()">
+                    <span class="mx-2">Nutzer Löschen</span>
+                </button>
+
         `;
         userProfileDiv.appendChild(userContainer);
 
-        if (userPets.length > 0) {
-            const petsContainer: HTMLDivElement = document.createElement('div');
-            petsContainer.innerHTML = '<h3>Pets</h3>';
-            const petsList: HTMLUListElement = document.createElement('ul');
+        const userTableBody: HTMLElement | null = document.getElementById('userTableBody');
+        if (userTableBody) {
+            userTableBody.innerHTML = '';
             userPets.forEach((pet: PetData) => {
-                const petItem: HTMLLIElement = document.createElement('li');
-                petItem.textContent = `${pet.name} - ${pet.kind}`;
-                petsList.appendChild(petItem);
+                const petRow: HTMLTableRowElement = document.createElement('tr');
+                petRow.innerHTML = `
+                    <td>${pet.name}</td>
+                    <td>${pet.kind}</td>
+                `;
+                userTableBody.appendChild(petRow);
             });
-            petsContainer.appendChild(petsList);
-            userProfileDiv.appendChild(petsContainer);
         }
     } catch (error) {
         console.error('Error rendering user profile:', error.message);
@@ -214,7 +240,7 @@ async function addUserPet() {
 
     const response = await fetch('/user/pets', {
         method: "POST",
-        body: JSON.stringify({ name, kind }),
+        body: JSON.stringify({name, kind}),
         headers: {
             "Content-Type": "application/json"
         },
@@ -644,7 +670,6 @@ async function deleteUserCloud(id: string) {
         console.log("Nutzer Gelöscht!");
     }
 }
-
 
 
 function scrollDown() {

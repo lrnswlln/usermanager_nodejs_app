@@ -150,6 +150,24 @@ app.post('/logout', async (req: express.Request, res: express.Response) => {
     }
 });
 
+app.delete('/user/delete', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+        await (await connection).execute('DELETE FROM Pets WHERE userId = ?', [userId]);
+        await (await connection).execute('DELETE FROM Users WHERE id = ?', [userId]);
+        req.session.destroy((err: any) => {
+            if (err) {
+                res.status(500).json({ error: "Beim Löschen des Benutzers ist ein Fehler aufgetreten." });
+                return;
+            }
+            res.clearCookie('sessionID'); // Optional: Cookie im Browser löschen
+            res.status(200).json({ message: "Benutzer wurde gelöscht und abgemeldet" });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 
