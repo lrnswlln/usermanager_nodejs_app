@@ -77,7 +77,7 @@ function deleteUser() {
                 case 6:
                     error_1 = _a.sent();
                     console.error('Unbekannter Fehler:', error_1);
-                    alert('Ein unbekannter Fehler ist aufgetreten.');
+                    errorModalCall('Ein unbekannter Fehler ist aufgetreten.');
                     return [3 /*break*/, 7];
                 case 7: return [2 /*return*/];
             }
@@ -283,7 +283,7 @@ document.querySelector("#formLogin").addEventListener("submit", function (event)
 // @ts-ignore
 function addUserPet() {
     return __awaiter(this, void 0, void 0, function () {
-        var petName, petKind, name, kind, response;
+        var petName, petKind, name, kind, response, error_7;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -291,6 +291,13 @@ function addUserPet() {
                     petKind = document.getElementById("petKind");
                     name = petName.value.trim();
                     kind = petKind.value.trim();
+                    if (!name || !kind) {
+                        errorModalCall("Bitte füllen Sie alle Felder aus.");
+                        return [2 /*return*/];
+                    }
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 7, , 8]);
                     return [4 /*yield*/, fetch('/user/pets', {
                             method: "POST",
                             body: JSON.stringify({ name: name, kind: kind }),
@@ -299,23 +306,34 @@ function addUserPet() {
                             },
                             credentials: "include"
                         })];
-                case 1:
+                case 2:
                     response = _a.sent();
-                    if (!response.ok) return [3 /*break*/, 4];
+                    if (!response.ok) return [3 /*break*/, 5];
                     console.log("Tier erfolgreich hinzugefügt");
                     return [4 /*yield*/, renderUserProfile()];
-                case 2:
+                case 3:
                     _a.sent();
                     return [4 /*yield*/, renderUserPetListAdmin()];
-                case 3:
+                case 4:
                     _a.sent();
                     petName.value = "";
                     petKind.value = "";
-                    return [3 /*break*/, 5];
-                case 4:
-                    console.error("Error adding pet:", response.statusText);
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 6];
+                case 5:
+                    if (response.status === 409) {
+                        errorModalCall("Ein Haustier mit diesem Namen existiert bereits für diesen Benutzer.");
+                    }
+                    else {
+                        errorModalCall("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.");
+                    }
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 8];
+                case 7:
+                    error_7 = _a.sent();
+                    console.error("Error adding pet:", error_7);
+                    errorModalCall("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.");
+                    return [3 /*break*/, 8];
+                case 8: return [2 /*return*/];
             }
         });
     });
@@ -542,7 +560,7 @@ async function editUserCloud(id: string) {
 */
 function editUserModal() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, editUser, editFirstName, editLastName, editEmail, editModal, error_7;
+        var response, editUser, editFirstName, editLastName, editEmail, editModal, error_8;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -574,8 +592,8 @@ function editUserModal() {
                     _a.label = 4;
                 case 4: return [3 /*break*/, 6];
                 case 5:
-                    error_7 = _a.sent();
-                    console.error("Error:", error_7);
+                    error_8 = _a.sent();
+                    console.error("Error:", error_8);
                     return [3 /*break*/, 6];
                 case 6: return [2 /*return*/];
             }
@@ -585,7 +603,7 @@ function editUserModal() {
 // Update USer
 function updateUser() {
     return __awaiter(this, void 0, void 0, function () {
-        var editFirstNameInput, editLastNameInput, editPasswordInput, editFirstName, editLastName, editPassword, response, editModal, error_8;
+        var editFirstNameInput, editLastNameInput, editPasswordInput, editFirstName, editLastName, editPassword, response, editModal, error_9;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -629,60 +647,14 @@ function updateUser() {
                     _a.label = 7;
                 case 7: return [3 /*break*/, 9];
                 case 8:
-                    error_8 = _a.sent();
-                    console.error('Fehler beim Aktualisieren des Benutzers:', error_8.message);
+                    error_9 = _a.sent();
+                    console.error('Fehler beim Aktualisieren des Benutzers:', error_9.message);
                     return [3 /*break*/, 9];
                 case 9: return [2 /*return*/];
             }
         });
     });
 }
-/*
-async function updateUserCloud(id: string) {
-
-    // Überprüft, ob ein User bearbeitet wird
-    if (id !== null) {
-        // Input Felder für Bearbeitung
-        const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
-        const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
-
-        // Trimmen der Werte
-        const editFirstName = editFirstNameInput.value.trim();
-        const editLastName = editLastNameInput.value.trim();
-
-        // Checken, ob die Eingabefelder alle gefüllt sind
-        if (editFirstName && editLastName) {
-            // Aktualisiert die Daten des ausgewählten Users
-
-            const response: Response = await fetch(`/users/${id}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    firstname: editFirstName,
-                    lastname: editLastName,
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include"
-            });
-
-            // Versteckt das Modal nach Bearbeitung
-            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
-            editModal.hide();
-
-
-            const button = document.getElementById('updateUser') as HTMLButtonElement;
-            if (button) {
-                button.setAttribute('onclick', `updateUserCloud(${null})`);
-            }
-
-            await renderUserList()
-        } else {
-            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
-        }
-    }
-}
-*/
 // @ts-ignore
 document.addEventListener("DOMContentLoaded", function () {
     var loginBtn = document.getElementById("loginBtn");
@@ -720,4 +692,13 @@ function greetUser(userName) {
     ];
     var randomIndex = Math.floor(Math.random() * greetings.length);
     return greetings[randomIndex];
+}
+function errorModalCall(errorMessage) {
+    var errorModalMessage = document.getElementById("errorModalMessage");
+    if (errorModalMessage) {
+        errorModalMessage.textContent = errorMessage;
+    }
+    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
+    var errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
+    errorModal.show();
 }

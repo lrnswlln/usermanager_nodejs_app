@@ -22,16 +22,16 @@ app.use(express.urlencoded({extended: false}));
 
 
 
-// Erweitere die SessionData-Schnittstelle
+//Session mit ID erweitern
 declare module 'express-session' {
     interface SessionData {
-        userId: string; // Hinzufügen der userId-Eigenschaft zur Session
+        userId: string;
     }
 }
 
-// Konfiguriere express-session Middleware
+// express-session config
 app.use(session({
-    secret: Math.random().toString(), // Bitte ersetze 'geheimnisvollesgeheimnis' durch ein zufälliges Geheimnis
+    secret: Math.random().toString(),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -56,7 +56,7 @@ async function checkDatabaseConnection() {
         console.log("Die Verbindung zur Datenbank wurde erfolgreich hergestellt.");
     } catch (error) {
         console.error("Fehler beim Herstellen der Verbindung zur Datenbank:", error);
-        process.exit(1); // Beende den Prozess, wenn die Verbindung fehlschlägt
+        process.exit(1); // Beende den Prozess bei Verbindungs fehlschlägen
     }
 }
 
@@ -68,7 +68,7 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
     if (req.session && req.session.userId) {
         return next(); // Der Benutzer ist authentifiziert
     } else {
-        res.status(401).json({ error: "Unauthorisierter Zugriff" });
+        res.status(401).json({ error: "Unauthorised Zugriff" });
     }
 }
 
@@ -286,12 +286,21 @@ app.post('/user/pets', requireAuth, async (req: express.Request, res: express.Re
             return;
         }
 
+        // schauen ob nutzer existiert
         const [existingUser]: any[] = await (await connection).query('SELECT id FROM Users WHERE id = ?', [userId]);
         if (!existingUser || existingUser.length === 0) {
             res.status(404).json({ error: "Benutzer nicht gefunden." });
             return;
         }
 
+        // schauen ob nutzer schon ein gleichnamiges Tier hat
+        const [existingPet]: any[] = await (await connection).query('SELECT id FROM Pets WHERE userId = ? AND name = ?', [userId, name]);
+        if (existingPet && existingPet.length > 0) {
+            res.status(409).json({ error: "Ein Haustier mit diesem Namen existiert bereits für diesen Benutzer." });
+            return;
+        }
+
+        // Haustier wird hinzugefügt
         const [result]: any[] = await (await connection).query('INSERT INTO Pets (userId, name, kind) VALUES (?, ?, ?)', [userId, name, kind]);
         const newPet = { id: result.insertId, userId, name, kind };
         res.status(201).json(newPet);

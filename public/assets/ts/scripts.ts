@@ -46,7 +46,7 @@ async function deleteUser(): Promise<void> {
             window.location.reload();
         } catch (error) {
             console.error('Unbekannter Fehler:', error);
-            alert('Ein unbekannter Fehler ist aufgetreten.');
+            errorModalCall('Ein unbekannter Fehler ist aufgetreten.');
         }
     }
 }
@@ -223,24 +223,36 @@ async function addUserPet() {
     const name = petName.value.trim();
     const kind = petKind.value.trim();
 
-    const response = await fetch('/user/pets', {
-        method: "POST",
-        body: JSON.stringify({name, kind}),
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    });
+    if (!name || !kind) {
+        errorModalCall("Bitte füllen Sie alle Felder aus.");
+        return;
+    }
 
-    if (response.ok) {
-        console.log("Tier erfolgreich hinzugefügt");
-        await renderUserProfile();
-        await renderUserPetListAdmin();
+    try {
+        const response = await fetch('/user/pets', {
+            method: "POST",
+            body: JSON.stringify({ name, kind }),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        });
 
-        petName.value = "";
-        petKind.value = "";
-    } else {
-        console.error("Error adding pet:", response.statusText);
+        if (response.ok) {
+            console.log("Tier erfolgreich hinzugefügt");
+            await renderUserProfile();
+            await renderUserPetListAdmin();
+
+            petName.value = "";
+            petKind.value = "";
+        } else if (response.status === 409) {
+            errorModalCall("Ein Haustier mit diesem Namen existiert bereits für diesen Benutzer.");
+        } else {
+            errorModalCall("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.");
+        }
+    } catch (error) {
+        console.error("Error adding pet:", error);
+        errorModalCall("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.");
     }
 }
 
@@ -521,52 +533,6 @@ async function updateUser(): Promise<void> {
     }
 }
 
-/*
-async function updateUserCloud(id: string) {
-
-    // Überprüft, ob ein User bearbeitet wird
-    if (id !== null) {
-        // Input Felder für Bearbeitung
-        const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
-        const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
-
-        // Trimmen der Werte
-        const editFirstName = editFirstNameInput.value.trim();
-        const editLastName = editLastNameInput.value.trim();
-
-        // Checken, ob die Eingabefelder alle gefüllt sind
-        if (editFirstName && editLastName) {
-            // Aktualisiert die Daten des ausgewählten Users
-
-            const response: Response = await fetch(`/users/${id}`, {
-                method: "PATCH",
-                body: JSON.stringify({
-                    firstname: editFirstName,
-                    lastname: editLastName,
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include"
-            });
-
-            // Versteckt das Modal nach Bearbeitung
-            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
-            editModal.hide();
-
-
-            const button = document.getElementById('updateUser') as HTMLButtonElement;
-            if (button) {
-                button.setAttribute('onclick', `updateUserCloud(${null})`);
-            }
-
-            await renderUserList()
-        } else {
-            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
-        }
-    }
-}
-*/
 
 // @ts-ignore
 
@@ -614,3 +580,14 @@ function greetUser(userName: string): string {
     return greetings[randomIndex];
 }
 
+
+function errorModalCall(errorMessage: string) {
+    const errorModalMessage = document.getElementById("errorModalMessage");
+    if (errorModalMessage) {
+        errorModalMessage.textContent = errorMessage;
+    }
+
+    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
+    const errorModal = new bootstrap.Modal(document.getElementById("errorModal") as HTMLElement);
+    errorModal.show();
+}

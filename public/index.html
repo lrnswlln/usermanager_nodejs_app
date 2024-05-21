@@ -107,7 +107,7 @@
         </div>
 
 
-        <div class="modal" id="editModal" tabindex="-1">
+        <div class="modal fade" id="editModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -152,7 +152,7 @@
             </div>
         </div>
 
-        <div class="modal" id="petAdminModal" tabindex="-1">
+        <div class="modal fade" id="petAdminModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -193,6 +193,27 @@
                     <div class="modal-footer" id="petModalFooter">
                         <button class="btn btn-success" data-bs-dismiss="modal" id="addPet" onclick="addPet()"
                                 type="button">Tier Hinzufügen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal text-white" id="errorModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-danger">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Fehlermeldung</h5>
+                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="errorModalMessage">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center" id="errorModalFooter">
+                        <button class="btn btn-light w-100" data-bs-dismiss="modal"
+                                type="button">Alles Klar!
                         </button>
                     </div>
                 </div>
