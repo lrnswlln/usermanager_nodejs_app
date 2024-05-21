@@ -1,14 +1,3 @@
-// Definiert die Benutzerklasse mit den erforderlichen Attributen
-class UserObject {
-    constructor(
-        public firstname: string,
-        public lastname: string,
-        public mail: string,
-        public password: string
-    ) {
-    }
-}
-
 
 interface UserData {
     firstname: string;
@@ -278,7 +267,6 @@ async function deleteUserPet(petId: number) {
     }
 }
 
-
 // @ts-ignore
 
 async function loginUser() {
@@ -312,7 +300,6 @@ async function loginUser() {
         errorModalCall("Fehler bei der Anmeldung, überprüfe deine Anmeldedaten!");
     }
 }
-
 
 async function addUser() {
 
@@ -359,12 +346,11 @@ function petAdmin() {
     const petFooterModal = document.getElementById("petModalFooter");
 
     if (petFooterModal) {
-        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden
+        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden -_> Clearen von vorhereigen Funktionscalls
         while (petFooterModal.firstChild) {
             petFooterModal.removeChild(petFooterModal.firstChild);
         }
 
-        // Das Button-Element erstellen
         const petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
         petButton.textContent = "Tier Hinzufügen";
@@ -373,7 +359,6 @@ function petAdmin() {
     }
 
     renderUserPetListAdmin();
-    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     const petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal") as HTMLElement);
     petAdminModal.show();
 }
@@ -410,46 +395,6 @@ async function renderUserPetListAdmin() {
     }
 }
 
-/*
-// @ts-ignore
-async function editUserCloud(id: string) {
-    const response: Response = await fetch(`/users/${id}`, {
-        credentials: "include"
-    });
-    if (response?.ok) {
-        const editUser = await response.json();
-
-        console.log(editUser);
-
-        const editFirstName = document.getElementById("editFirstName") as HTMLInputElement;
-        const editLastName = document.getElementById("editLastName") as HTMLInputElement;
-        const editPassword = document.getElementById("editPassword") as HTMLInputElement;
-        const editEmail = document.getElementById("editEmail") as HTMLInputElement;
-
-        if (editFirstName && editLastName && editEmail) {
-            // setzt Userdaten in die Inputfelder
-            editFirstName.value = editUser.firstname;
-            editLastName.value = editUser.lastname;
-            editPassword.value = editUser.password;
-            editEmail.value = editUser.mail;
-
-            const button = document.getElementById('updateUser') as HTMLButtonElement;
-            if (button) {
-                button.setAttribute('onclick', `updateUserCloud('${id}')`);
-            }
-
-            // Öffnet das Bootstrap 5 Modal für die Bearbeitung
-            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
-            editModal.show();
-        }
-
-    } else {
-        console.log("Error: Response is not OK", response.statusText);
-    }
-}
-*/
-
-
 async function editUserModal() {
     try {
         const response: Response = await fetch('/user/profile', {
@@ -466,13 +411,10 @@ async function editUserModal() {
             const editEmail = document.getElementById("editEmail") as HTMLInputElement;
 
             if (editFirstName && editLastName && editEmail) {
-                // Setze Userdaten in die Inputfelder
                 editFirstName.value = editUser[0].firstname;
                 editLastName.value = editUser[0].lastname;
                 editEmail.value = editUser[0].mail;
 
-
-                // Öffne das Bootstrap 5 Modal für die Bearbeitung
                 const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
                 editModal.show();
             }
@@ -484,23 +426,18 @@ async function editUserModal() {
     }
 }
 
-
 // Update USer
 async function updateUser(): Promise<void> {
     try {
-        // Input Felder für Bearbeitung
         const editFirstNameInput = document.getElementById("editFirstName") as HTMLInputElement;
         const editLastNameInput = document.getElementById("editLastName") as HTMLInputElement;
         const editPasswordInput = document.getElementById("editPassword") as HTMLInputElement;
 
-        // Trimmen der Werte
         const editFirstName = editFirstNameInput.value.trim();
         const editLastName = editLastNameInput.value.trim();
         const editPassword = editPasswordInput.value.trim();
 
-        // Überprüft, ob ein User bearbeitet wird
         if (editFirstName && editLastName) {
-            // Aktualisiert die Daten des ausgewählten Users
             const response = await fetch(`/user/update`, {
                 method: "PATCH",
                 body: JSON.stringify({
@@ -521,7 +458,6 @@ async function updateUser(): Promise<void> {
                 await renderUserProfile();
             }
 
-            // Versteckt das Modal nach Bearbeitung
             const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
             editModal.hide();
 
@@ -531,12 +467,11 @@ async function updateUser(): Promise<void> {
         }
     } catch (error) {
         console.error('Fehler beim Aktualisieren des Benutzers:', error.message);
-        // Hier kannst du Fehlerhandhabung hinzufügen, falls erforderlich
     }
 }
 
 
-// @ts-ignore
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -557,7 +492,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function scrollDown() {
-    //this.scroller.scrollToAnchor("targetGreen");
     document.getElementById("userList").scrollIntoView({
         behavior: "smooth",
         block: "start",
@@ -569,7 +503,7 @@ function greetUser(userName: string): string {
         `Hallo, ${userName}!`,
         `Guten Tag, ${userName}!`,
         `Hi, ${userName}!`,
-        `Willkommen, ${userName}!`,
+        `Gude, ${userName}!`,
         `Grüß dich, ${userName}!`,
         `Servus, ${userName}!`,
         `Moin, ${userName}!`,
@@ -589,7 +523,6 @@ function errorModalCall(errorMessage: string) {
         errorModalMessage.textContent = errorMessage;
     }
 
-    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     const errorModal = new bootstrap.Modal(document.getElementById("errorModal") as HTMLElement);
     errorModal.show();
 }

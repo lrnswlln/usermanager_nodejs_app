@@ -34,16 +34,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// Definiert die Benutzerklasse mit den erforderlichen Attributen
-var UserObject = /** @class */ (function () {
-    function UserObject(firstname, lastname, mail, password) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.mail = mail;
-        this.password = password;
-    }
-    return UserObject;
-}());
 function deleteUser() {
     return __awaiter(this, void 0, void 0, function () {
         var result, response, errorData, responseData, error_1;
@@ -465,11 +455,10 @@ function addUser() {
 function petAdmin() {
     var petFooterModal = document.getElementById("petModalFooter");
     if (petFooterModal) {
-        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden
+        // Zuerst alle vorhandenen Buttons entfernen, falls vorhanden -_> Clearen von vorhereigen Funktionscalls
         while (petFooterModal.firstChild) {
             petFooterModal.removeChild(petFooterModal.firstChild);
         }
-        // Das Button-Element erstellen
         var petButton = document.createElement("button");
         petButton.className = "btn btn-info m-3 bi bi-database-fill-add";
         petButton.textContent = "Tier Hinzufügen";
@@ -477,7 +466,6 @@ function petAdmin() {
         petFooterModal.appendChild(petButton);
     }
     renderUserPetListAdmin();
-    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     var petAdminModal = new bootstrap.Modal(document.getElementById("petAdminModal"));
     petAdminModal.show();
 }
@@ -521,44 +509,6 @@ function renderUserPetListAdmin() {
         });
     });
 }
-/*
-// @ts-ignore
-async function editUserCloud(id: string) {
-    const response: Response = await fetch(`/users/${id}`, {
-        credentials: "include"
-    });
-    if (response?.ok) {
-        const editUser = await response.json();
-
-        console.log(editUser);
-
-        const editFirstName = document.getElementById("editFirstName") as HTMLInputElement;
-        const editLastName = document.getElementById("editLastName") as HTMLInputElement;
-        const editPassword = document.getElementById("editPassword") as HTMLInputElement;
-        const editEmail = document.getElementById("editEmail") as HTMLInputElement;
-
-        if (editFirstName && editLastName && editEmail) {
-            // setzt Userdaten in die Inputfelder
-            editFirstName.value = editUser.firstname;
-            editLastName.value = editUser.lastname;
-            editPassword.value = editUser.password;
-            editEmail.value = editUser.mail;
-
-            const button = document.getElementById('updateUser') as HTMLButtonElement;
-            if (button) {
-                button.setAttribute('onclick', `updateUserCloud('${id}')`);
-            }
-
-            // Öffnet das Bootstrap 5 Modal für die Bearbeitung
-            const editModal = new bootstrap.Modal(document.getElementById("editModal") as HTMLElement);
-            editModal.show();
-        }
-
-    } else {
-        console.log("Error: Response is not OK", response.statusText);
-    }
-}
-*/
 function editUserModal() {
     return __awaiter(this, void 0, void 0, function () {
         var response, editUser, editFirstName, editLastName, editEmail, editModal, error_8;
@@ -580,7 +530,6 @@ function editUserModal() {
                     editLastName = document.getElementById("editLastName");
                     editEmail = document.getElementById("editEmail");
                     if (editFirstName && editLastName && editEmail) {
-                        // Setze Userdaten in die Inputfelder
                         editFirstName.value = editUser[0].firstname;
                         editLastName.value = editUser[0].lastname;
                         editEmail.value = editUser[0].mail;
@@ -656,7 +605,6 @@ function updateUser() {
         });
     });
 }
-// @ts-ignore
 document.addEventListener("DOMContentLoaded", function () {
     var loginBtn = document.getElementById("loginBtn");
     var registerBtn = document.getElementById("registerBtn");
@@ -672,7 +620,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 function scrollDown() {
-    //this.scroller.scrollToAnchor("targetGreen");
     document.getElementById("userList").scrollIntoView({
         behavior: "smooth",
         block: "start",
@@ -683,7 +630,7 @@ function greetUser(userName) {
         "Hallo, ".concat(userName, "!"),
         "Guten Tag, ".concat(userName, "!"),
         "Hi, ".concat(userName, "!"),
-        "Willkommen, ".concat(userName, "!"),
+        "Gude, ".concat(userName, "!"),
         "Gr\u00FC\u00DF dich, ".concat(userName, "!"),
         "Servus, ".concat(userName, "!"),
         "Moin, ".concat(userName, "!"),
@@ -699,7 +646,6 @@ function errorModalCall(errorMessage) {
     if (errorModalMessage) {
         errorModalMessage.textContent = errorMessage;
     }
-    // Öffnet das Bootstrap 5 Modal für die Bearbeitung
     var errorModal = new bootstrap.Modal(document.getElementById("errorModal"));
     errorModal.show();
 }
