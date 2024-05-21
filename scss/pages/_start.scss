@@ -4,6 +4,10 @@
   background-attachment: fixed;
   overflow: hidden;
 
+  .container-thin {
+    max-width: 756px;
+  }
+
   .btn-sparkle {
     background-image: url("../media/U3qYN8S0j3bpK.webp") !important; // Quelle:  https://giphy.com/gifs/stars-U3qYN8S0j3bpK
     background-size: cover;
