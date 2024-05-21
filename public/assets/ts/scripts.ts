@@ -110,6 +110,7 @@ async function renderUserProfile() {
                 <span class="mx-2">Logout</span>
             </button>
             </div>
+            <img class="mb-4" src="assets/media/Profile.png" alt="Profile" width="200px">
             <h5>Deine Daten:</h5>
             <p><b>Vorname:</b> ${userData.firstname}</p>
             <p><b>Nachname:</b> ${userData.lastname}</p>
