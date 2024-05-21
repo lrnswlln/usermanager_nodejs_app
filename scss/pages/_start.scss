@@ -15,6 +15,33 @@
     box-shadow: 0 0 30px var(--box-shadow-color);
   }
 
+  .btn-animal {
+    position: relative;
+    background-image: url("../media/tHIRLHtNwxpjIFqPdV.webp") !important; // Quelle:  https://giphy.com/gifs/justviralnet-funny-cool-monkey-Rlwz4m0aHgXH13jyrE
+    background-size: cover;
+    --box-shadow-color: black;
+    box-shadow: 0 0 30px var(--box-shadow-color);
+    color: white; // Textfarbe weiß, damit sie auf dem dunklen Hintergrund gut sichtbar ist
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7); // Halbtransparente schwarze Ebene
+      z-index: 1;
+      border-radius: inherit; // Damit der Schatten der Knopfform folgt
+    }
+
+    span {
+      position: relative;
+      z-index: 2; // Text über die dunkle Ebene legen
+    }
+  }
+
+
   .btn-primary.btn-sparkle {
     --box-shadow-color: #007bff;
   }

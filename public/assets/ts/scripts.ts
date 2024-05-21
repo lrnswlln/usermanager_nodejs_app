@@ -114,24 +114,25 @@ async function renderUserProfile() {
         const greetingMessage = greetUser(userData.firstname);
 
         userContainer.innerHTML = `
-            <h2 class="mb-5">${greetingMessage}</h2>
+            <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="mt-1">${greetingMessage}</h2>
+                                        <button class="btn btn-danger my-3 p-3 bi bi-door-open-fill btn-sparkle" id="userLogout"
+                    onclick="userLogout()">
+                <span class="mx-2">Logout</span>
+            </button>
+            </div>
             <h5>Deine Daten:</h5>
             <p><b>Vorname:</b> ${userData.firstname}</p>
             <p><b>Nachname:</b> ${userData.lastname}</p>
             <p><b>E-Mail:</b> ${userData.mail}</p>
-                        <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="editUserModal"
+                        <button class="btn btn-danger my-3 p-3 bi bi-pen-fill btn-sparkle" id="editUserModal"
                     onclick="editUserModal()">
                 <span class="mx-2">Bearbeiten</span>
             </button>
-                            <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle"
+                            <button class="btn btn-danger my-3 p-3 bi bi-trash-fill btn-sparkle"
                         onclick="deleteUser()">
                     <span class="mx-2">Nutzer Löschen</span>
                 </button>
-                            <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="userLogout"
-                    onclick="userLogout()">
-                <span class="mx-2">Logout</span>
-            </button>
-
         `;
         userProfileDiv.appendChild(userContainer);
 
@@ -177,6 +178,7 @@ async function userLogout(): Promise<void> {
             userTableBody.innerHTML = '';
             //window.location.reload(); //Könnte man nen Reload erzwingen für vollständiges Daten clearen
             console.log('Abmeldung erfolgreich');
+            errorModalCall('Abmeldung erfolgreich');
         } else {
             console.error('Fehler beim Abmelden:', response.statusText);
         }
@@ -257,7 +259,7 @@ async function addUserPet() {
 }
 
 async function deleteUserPet(petId: number) {
-    const result = window.confirm("Möchten Sie das Element wirklich löschen?");
+    const result = window.confirm("Möchten Sie das Tier des Nutzers wirklich löschen?");
 
     if (result) {
         const response: Response = await fetch(`/user/pets/${petId}`, {
@@ -303,11 +305,11 @@ async function loginUser() {
         emailLoginInput.value = "";
         passwordLoginInput.value = "";
 
-        console.log("login successfully!");
+        console.log("login successfulll!");
     } else {
         console.log("Error: Response is not OK", response.statusText);
         const errorMessage = await response.text();
-        alert(errorMessage);
+        errorModalCall("Fehler bei der Anmeldung, überprüfe deine Anmeldedaten!");
     }
 }
 
@@ -347,7 +349,7 @@ async function addUser() {
         await renderUserProfile();
     } else {
         console.log("Error: Response is not OK", response.status);
-        alert(response.body)
+        errorModalCall("Registrierung Fehlgeschlagen, E-Mail bereits vergeben");
     }
 }
 
@@ -525,7 +527,7 @@ async function updateUser(): Promise<void> {
 
             await renderUserProfile();
         } else {
-            alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+            errorModalCall("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
         }
     } catch (error) {
         console.error('Fehler beim Aktualisieren des Benutzers:', error.message);

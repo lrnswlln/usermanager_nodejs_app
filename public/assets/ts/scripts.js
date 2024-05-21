@@ -176,7 +176,7 @@ function renderUserProfile() {
                     userProfileDiv.innerHTML = '';
                     userContainer = document.createElement('div');
                     greetingMessage = greetUser(userData.firstname);
-                    userContainer.innerHTML = "\n            <h2 class=\"mb-5\">".concat(greetingMessage, "</h2>\n            <h5>Deine Daten:</h5>\n            <p><b>Vorname:</b> ").concat(userData.firstname, "</p>\n            <p><b>Nachname:</b> ").concat(userData.lastname, "</p>\n            <p><b>E-Mail:</b> ").concat(userData.mail, "</p>\n                        <button class=\"btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle\" id=\"editUserModal\"\n                    onclick=\"editUserModal()\">\n                <span class=\"mx-2\">Bearbeiten</span>\n            </button>\n                            <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\"\n                        onclick=\"deleteUser()\">\n                    <span class=\"mx-2\">Nutzer L\u00F6schen</span>\n                </button>\n                            <button class=\"btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle\" id=\"userLogout\"\n                    onclick=\"userLogout()\">\n                <span class=\"mx-2\">Logout</span>\n            </button>\n\n        ");
+                    userContainer.innerHTML = "\n            <div class=\"d-flex justify-content-between align-items-center mb-5\">\n            <h2 class=\"mt-1\">".concat(greetingMessage, "</h2>\n                                        <button class=\"btn btn-danger my-3 p-3 bi bi-door-open-fill btn-sparkle\" id=\"userLogout\"\n                    onclick=\"userLogout()\">\n                <span class=\"mx-2\">Logout</span>\n            </button>\n            </div>\n            <h5>Deine Daten:</h5>\n            <p><b>Vorname:</b> ").concat(userData.firstname, "</p>\n            <p><b>Nachname:</b> ").concat(userData.lastname, "</p>\n            <p><b>E-Mail:</b> ").concat(userData.mail, "</p>\n                        <button class=\"btn btn-danger my-3 p-3 bi bi-pen-fill btn-sparkle\" id=\"editUserModal\"\n                    onclick=\"editUserModal()\">\n                <span class=\"mx-2\">Bearbeiten</span>\n            </button>\n                            <button class=\"btn btn-danger my-3 p-3 bi bi-trash-fill btn-sparkle\"\n                        onclick=\"deleteUser()\">\n                    <span class=\"mx-2\">Nutzer L\u00F6schen</span>\n                </button>\n        ");
                     userProfileDiv.appendChild(userContainer);
                     userTableBody_1 = document.getElementById('userTableBody');
                     if (userTableBody_1) {
@@ -227,6 +227,7 @@ function userLogout() {
                         userTableBody.innerHTML = '';
                         //window.location.reload(); //Könnte man nen Reload erzwingen für vollständiges Daten clearen
                         console.log('Abmeldung erfolgreich');
+                        errorModalCall('Abmeldung erfolgreich');
                     }
                     else {
                         console.error('Fehler beim Abmelden:', response.statusText);
@@ -344,7 +345,7 @@ function deleteUserPet(petId) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    result = window.confirm("Möchten Sie das Element wirklich löschen?");
+                    result = window.confirm("Möchten Sie das Tier des Nutzers wirklich löschen?");
                     if (!result) return [3 /*break*/, 6];
                     return [4 /*yield*/, fetch("/user/pets/".concat(petId), {
                             method: "DELETE",
@@ -399,14 +400,14 @@ function loginUser() {
                     renderUserProfile();
                     emailLoginInput.value = "";
                     passwordLoginInput.value = "";
-                    console.log("login successfully!");
+                    console.log("login successfulll!");
                     return [3 /*break*/, 4];
                 case 2:
                     console.log("Error: Response is not OK", response.statusText);
                     return [4 /*yield*/, response.text()];
                 case 3:
                     errorMessage = _a.sent();
-                    alert(errorMessage);
+                    errorModalCall("Fehler bei der Anmeldung, überprüfe deine Anmeldedaten!");
                     _a.label = 4;
                 case 4: return [2 /*return*/];
             }
@@ -453,7 +454,7 @@ function addUser() {
                     return [3 /*break*/, 4];
                 case 3:
                     console.log("Error: Response is not OK", response.status);
-                    alert(response.body);
+                    errorModalCall("Registrierung Fehlgeschlagen, E-Mail bereits vergeben");
                     _a.label = 4;
                 case 4: return [2 /*return*/];
             }
@@ -643,7 +644,7 @@ function updateUser() {
                     _a.sent();
                     return [3 /*break*/, 7];
                 case 6:
-                    alert("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
+                    errorModalCall("Daten wurden nicht aktualisiert, weil nicht alle Felder ausgefüllt waren!");
                     _a.label = 7;
                 case 7: return [3 /*break*/, 9];
                 case 8:

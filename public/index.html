@@ -11,7 +11,7 @@
 <body>
 <div class="container-fluid container-background">
 
-    <div class="container">
+    <div class="container container-thin">
         <header class="d-block d-md-flex justify-content-around justify-content-md-between py-5 my-5">
             <h1 class="text-white text-center" id="pageHeadline">User Manager</h1>
             <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
@@ -86,11 +86,15 @@
         <div class="user-profile w-100 bg-white border rounded rounded-3 p-5 bg-opacity-07" id="user-profile-container" style="display: none">
             <div class="user-profile-data" id="user-profile"></div>
             <div class="display-user-pets" id="userPetList">
-                <h3 class="w-100 text-center mt-4">Deine Tiere</h3>
-                <button class="btn btn-danger my-5 p-3 bi bi-gitlab btn-sparkle"
-                        onclick="petAdmin()">
-                    <span class="mx-2">Tiere verwalten</span>
-                </button>
+
+
+                <div class="d-flex mt-4 justify-content-between align-items-center border-top">
+                    <h3 class="w-100">Deine Tiere</h3>
+                    <button class="btn btn-danger mt-2 mb-5 py-5 btn-animal"
+                            onclick="petAdmin()">
+                        <span class="mx-2">Tiere verwalten</span>
+                    </button>
+                </div>
 
                 <table class="table table-hover align-middle table-responsive border rounded rounded-3 overflow-hidden">
                     <thead>
@@ -203,7 +207,7 @@
             <div class="modal-dialog">
                 <div class="modal-content bg-danger">
                     <div class="modal-header">
-                        <h5 class="modal-title">Fehlermeldung</h5>
+                        <h5 class="modal-title">Achtung</h5>
                         <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                     </div>
                     <div class="modal-body">
