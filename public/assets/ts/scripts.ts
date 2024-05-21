@@ -24,25 +24,30 @@ interface PetData {
 }
 
 async function deleteUser(): Promise<void> {
-    try {
-        const response = await fetch('/user/delete', {
-            method: 'DELETE',
-            credentials: 'include'
-        });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Fehler beim Löschen des Benutzers:', errorData.error);
-            alert('Fehler beim Löschen des Benutzers: ' + errorData.error);
-            return;
+    const result = window.confirm("Möchten Sie das Element wirklich löschen?");
+
+    if (result) {
+        try {
+            const response = await fetch('/user/delete', {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Fehler beim Löschen des Benutzers:', errorData.error);
+                alert('Fehler beim Löschen des Benutzers: ' + errorData.error);
+                return;
+            }
+
+            const responseData = await response.json();
+            console.log(responseData.message);
+            window.location.reload();
+        } catch (error) {
+            console.error('Unbekannter Fehler:', error);
+            alert('Ein unbekannter Fehler ist aufgetreten.');
         }
-
-        const responseData = await response.json();
-        console.log(responseData.message);
-        window.location.reload();
-    } catch (error) {
-        console.error('Unbekannter Fehler:', error);
-        alert('Ein unbekannter Fehler ist aufgetreten.');
     }
 }
 
@@ -86,30 +91,46 @@ async function fetchUserPets(): Promise<PetData[]> {
 
 async function renderUserProfile() {
     const userProfile: HTMLElement | null = document.getElementById('user-profile');
-    if (userProfile) userProfile.innerHTML = "";
-
+    if (userProfile)
+        userProfile.innerHTML = "";
     try {
         const userData: UserData = await fetchUserProfile();
         const userPets: PetData[] = await fetchUserPets();
 
-        console.log("test" + userData);
+        console.log("Fetch Data aus Rendering Funktion" + userData);
+        console.log("Fetch Data aus Rendering Funktion" + userPets);
 
-        const userProfileDiv: HTMLElement | null = document.getElementById('user-profile');
+        const userProfileContainer: HTMLElement = document.getElementById('user-profile-container');
+        const userProfileDiv: HTMLElement = document.getElementById('user-profile');
+        const userLoginDiv: HTMLElement = document.getElementById('register-login');
         if (!userProfileDiv) return;
+
+        userProfileContainer.style.display = "block";
+        userLoginDiv.style.display = "none";
 
         userProfileDiv.innerHTML = '';
 
         const userContainer: HTMLDivElement = document.createElement('div');
+        const greetingMessage = greetUser(userData.firstname);
+
         userContainer.innerHTML = `
-            <h2>User Profile</h2>
-            <p>First Name: ${userData.firstname}</p>
-            <p>Last Name: ${userData.lastname}</p>
-            <p>Email: ${userData.mail}</p>
-            
+            <h2 class="mb-5">${greetingMessage}</h2>
+            <h5>Deine Daten:</h5>
+            <p><b>Vorname:</b> ${userData.firstname}</p>
+            <p><b>Nachname:</b> ${userData.lastname}</p>
+            <p><b>E-Mail:</b> ${userData.mail}</p>
+                        <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="editUserModal"
+                    onclick="editUserModal()">
+                <span class="mx-2">Bearbeiten</span>
+            </button>
                             <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle"
                         onclick="deleteUser()">
                     <span class="mx-2">Nutzer Löschen</span>
                 </button>
+                            <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="userLogout"
+                    onclick="userLogout()">
+                <span class="mx-2">Logout</span>
+            </button>
 
         `;
         userProfileDiv.appendChild(userContainer);
@@ -120,8 +141,8 @@ async function renderUserProfile() {
             userPets.forEach((pet: PetData) => {
                 const petRow: HTMLTableRowElement = document.createElement('tr');
                 petRow.innerHTML = `
-                    <td>${pet.name}</td>
-                    <td>${pet.kind}</td>
+                    <td data-label=Name>${pet.name}</td>
+                    <td data-label=Tierart>${pet.kind}</td>
                 `;
                 userTableBody.appendChild(petRow);
             });
@@ -136,6 +157,9 @@ renderUserProfile();
 async function userLogout(): Promise<void> {
 
     const userProfile: HTMLElement | null = document.getElementById('user-profile');
+    const userTableBody: HTMLElement | null = document.getElementById('userTableBody');
+    const userProfileContainer: HTMLElement = document.getElementById('user-profile-container');
+    const userLoginDiv: HTMLElement = document.getElementById('register-login');
 
     try {
         const response = await fetch('/logout', {
@@ -147,7 +171,11 @@ async function userLogout(): Promise<void> {
         });
 
         if (response.ok) {
+            userProfileContainer.style.display = "none";
+            userLoginDiv.style.display = "block";
             userProfile.innerHTML = "";
+            userTableBody.innerHTML = '';
+            //window.location.reload(); //Könnte man nen Reload erzwingen für vollständiges Daten clearen
             console.log('Abmeldung erfolgreich');
         } else {
             console.error('Fehler beim Abmelden:', response.statusText);
@@ -157,8 +185,6 @@ async function userLogout(): Promise<void> {
     }
 }
 
-
-// Beispiel für die Verwendung der Funktionen
 async function fetchData() {
     try {
         const userProfile = await fetchUserProfile();
@@ -189,47 +215,6 @@ document.querySelector("#formLogin").addEventListener("submit", (event) => {
     loginUser();
 });
 
-function generateRandomUser() {
-    const firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia"];
-    const lastNames = ["Smith", "Johnson", "Brown", "Williams", "Jones", "Garcia"];
-    const domains = ["gmail.com", "yahoo.com", "outlook.com", "example.com"];
-    const passwords = ["password123", "abc123", "qwerty", "letmein", "password"];
-
-    const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
-    const randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
-
-    const randomEmail = `${randomFirstName.toLowerCase()}.${randomLastName.toLowerCase()}@${randomDomain}`;
-
-    return new UserObject(randomFirstName, randomLastName, randomEmail, randomPassword);
-}
-
-async function addRandomUser() {
-    const randomUser = generateRandomUser();
-
-    const response = await fetch("/users", {
-        method: "POST",
-        body: JSON.stringify({
-            firstname: randomUser.firstname,
-            lastname: randomUser.lastname,
-            mail: randomUser.mail,
-            password: randomUser.password
-        }),
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-    });
-
-    if (response.ok) {
-        console.log("Random user added successfully!");
-        await renderUserList();
-    } else {
-        console.error("Error adding random user:", response.statusText);
-    }
-}
-
 // @ts-ignore
 async function addUserPet() {
     const petName = document.getElementById("petName") as HTMLInputElement;
@@ -249,7 +234,7 @@ async function addUserPet() {
 
     if (response.ok) {
         console.log("Tier erfolgreich hinzugefügt");
-        await renderUserList();
+        await renderUserProfile();
         await renderUserPetListAdmin();
 
         petName.value = "";
@@ -259,7 +244,7 @@ async function addUserPet() {
     }
 }
 
-async function deleteUserPet(petId: string) {
+async function deleteUserPet(petId: number) {
     const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
     if (result) {
@@ -270,7 +255,7 @@ async function deleteUserPet(petId: string) {
 
         if (response.ok) {
             await renderUserPetListAdmin();
-            await renderUserList();
+            await renderUserProfile();
         } else {
             console.error("Error: Response is not OK", response.statusText);
         }
@@ -347,7 +332,7 @@ async function addUser() {
         emailInput.value = "";
         passwordInput.value = "";
 
-        await renderUserList();
+        await renderUserProfile();
     } else {
         console.log("Error: Response is not OK", response.status);
         alert(response.body)
@@ -355,74 +340,6 @@ async function addUser() {
 }
 
 // @ts-ignore
-async function renderUserList() {
-    const tableBody: HTMLTableElement | null = document.getElementById("userTableBody") as HTMLTableElement;
-
-    const response: Response = await fetch("/users", {
-        credentials: "include"
-    });
-
-    if (response?.ok) {
-        const users = await response.json();
-
-        if (tableBody) {
-            tableBody.innerHTML = "";
-
-            for (const user of users) {
-                const userPets = await renderUserPetMain(user.id);
-
-                const row = tableBody.insertRow();
-
-                const emailCell = row.insertCell(0);
-                emailCell.textContent = user.mail;
-                emailCell.setAttribute("data-label", "E-Mail");
-
-                const lastNameCell = row.insertCell(1);
-                lastNameCell.textContent = user.lastname;
-                lastNameCell.setAttribute("data-label", "Nachname");
-
-                const firstNameCell = row.insertCell(2);
-                firstNameCell.textContent = user.firstname;
-                firstNameCell.setAttribute("data-label", "Vorname");
-
-                const petCell = row.insertCell(3);
-                petCell.textContent = userPets.map((pet: any) => pet.name).join(", ");
-                petCell.setAttribute("data-label", "Pets");
-
-                // Füge Editier- und Lösch-Buttons hinzu
-                const actionsCell = row.insertCell(4);
-                const editButton = document.createElement("button");
-                editButton.className = "btn btn-warning m-3 bi bi-pen";
-                editButton.addEventListener("click", () => editUserCloud(user.id));
-                console.log(user.id);
-                actionsCell.appendChild(editButton);
-
-                const deleteButton = document.createElement("button");
-                deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                deleteButton.addEventListener("click", () => deleteUserCloud(user.id));
-                actionsCell.appendChild(deleteButton);
-
-                const petButton = document.createElement("button");
-                petButton.className = "btn btn-primary m-3 bi bi-gitlab";
-                petButton.addEventListener("click", () => petAdmin(user.id));
-                actionsCell.appendChild(petButton);
-            }
-        }
-    } else {
-        console.log("Error: Response is not OK", response.statusText);
-    }
-}
-
-async function renderUserPetMain(id: string) {
-    const responsePet: Response = await fetch(`/users/${id}/pets`, {
-        credentials: "include"
-    });
-    if (responsePet?.ok) {
-        const userPets = await responsePet.json();
-        return userPets;
-    }
-    return []; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
-}
 
 function petAdmin() {
     const petFooterModal = document.getElementById("petModalFooter");
@@ -568,7 +485,7 @@ async function updateUser(): Promise<void> {
         const editPassword = editPasswordInput.value.trim();
 
         // Überprüft, ob ein User bearbeitet wird
-        if (editFirstName && editLastName && editPassword) {
+        if (editFirstName && editLastName) {
             // Aktualisiert die Daten des ausgewählten Users
             const response = await fetch(`/user/update`, {
                 method: "PATCH",
@@ -652,25 +569,24 @@ async function updateUserCloud(id: string) {
 */
 
 // @ts-ignore
-async function deleteUserCloud(id: string) {
 
-    const result = window.confirm("Möchten Sie das Element wirklich löschen?");
 
-    if (result) {
-        const response: Response = await fetch(`/users/${id}`, {
-            method: "DELETE",
-            credentials: "include"
-        });
-        if (response?.ok) {
+document.addEventListener("DOMContentLoaded", function() {
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
 
-            await renderUserList();
-        } else {
-            console.log("Error: Response is not OK", response.statusText);
-        }
-        console.log("Nutzer Gelöscht!");
-    }
-}
+    loginBtn.addEventListener("click", function() {
+        loginForm.style.display = "block";
+        registerForm.style.display = "none";
+    });
 
+    registerBtn.addEventListener("click", function() {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+    });
+});
 
 function scrollDown() {
     //this.scroller.scrollToAnchor("targetGreen");
@@ -680,5 +596,21 @@ function scrollDown() {
     });
 }
 
+function greetUser(userName: string): string {
+    const greetings = [
+        `Hallo, ${userName}!`,
+        `Guten Tag, ${userName}!`,
+        `Hi, ${userName}!`,
+        `Willkommen, ${userName}!`,
+        `Grüß dich, ${userName}!`,
+        `Servus, ${userName}!`,
+        `Moin, ${userName}!`,
+        `Hey, ${userName}!`,
+        `Schön dich zu sehen, ${userName}!`,
+        `Herzlich willkommen, ${userName}!`
+    ];
 
+    const randomIndex = Math.floor(Math.random() * greetings.length);
+    return greetings[randomIndex];
+}
 

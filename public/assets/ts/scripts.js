@@ -46,36 +46,40 @@ var UserObject = /** @class */ (function () {
 }());
 function deleteUser() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, errorData, responseData, error_1;
+        var result, response, errorData, responseData, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 5, , 6]);
+                    result = window.confirm("Möchten Sie das Element wirklich löschen?");
+                    if (!result) return [3 /*break*/, 7];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 6, , 7]);
                     return [4 /*yield*/, fetch('/user/delete', {
                             method: 'DELETE',
                             credentials: 'include'
                         })];
-                case 1:
-                    response = _a.sent();
-                    if (!!response.ok) return [3 /*break*/, 3];
-                    return [4 /*yield*/, response.json()];
                 case 2:
+                    response = _a.sent();
+                    if (!!response.ok) return [3 /*break*/, 4];
+                    return [4 /*yield*/, response.json()];
+                case 3:
                     errorData = _a.sent();
                     console.error('Fehler beim Löschen des Benutzers:', errorData.error);
                     alert('Fehler beim Löschen des Benutzers: ' + errorData.error);
                     return [2 /*return*/];
-                case 3: return [4 /*yield*/, response.json()];
-                case 4:
+                case 4: return [4 /*yield*/, response.json()];
+                case 5:
                     responseData = _a.sent();
                     console.log(responseData.message);
                     window.location.reload();
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 7];
+                case 6:
                     error_1 = _a.sent();
                     console.error('Unbekannter Fehler:', error_1);
                     alert('Ein unbekannter Fehler ist aufgetreten.');
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
+                    return [3 /*break*/, 7];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -144,7 +148,7 @@ function fetchUserPets() {
 }
 function renderUserProfile() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, userData, userPets, userProfileDiv, userContainer, userTableBody_1, error_4;
+        var userProfile, userData, userPets, userProfileContainer, userProfileDiv, userLoginDiv, userContainer, greetingMessage, userTableBody_1, error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -160,20 +164,26 @@ function renderUserProfile() {
                     return [4 /*yield*/, fetchUserPets()];
                 case 3:
                     userPets = _a.sent();
-                    console.log("test" + userData);
+                    console.log("Fetch Data aus Rendering Funktion" + userData);
+                    console.log("Fetch Data aus Rendering Funktion" + userPets);
+                    userProfileContainer = document.getElementById('user-profile-container');
                     userProfileDiv = document.getElementById('user-profile');
+                    userLoginDiv = document.getElementById('register-login');
                     if (!userProfileDiv)
                         return [2 /*return*/];
+                    userProfileContainer.style.display = "block";
+                    userLoginDiv.style.display = "none";
                     userProfileDiv.innerHTML = '';
                     userContainer = document.createElement('div');
-                    userContainer.innerHTML = "\n            <h2>User Profile</h2>\n            <p>First Name: ".concat(userData.firstname, "</p>\n            <p>Last Name: ").concat(userData.lastname, "</p>\n            <p>Email: ").concat(userData.mail, "</p>\n            \n                            <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\"\n                        onclick=\"deleteUser()\">\n                    <span class=\"mx-2\">Nutzer L\u00F6schen</span>\n                </button>\n\n        ");
+                    greetingMessage = greetUser(userData.firstname);
+                    userContainer.innerHTML = "\n            <h2 class=\"mb-5\">".concat(greetingMessage, "</h2>\n            <h5>Deine Daten:</h5>\n            <p><b>Vorname:</b> ").concat(userData.firstname, "</p>\n            <p><b>Nachname:</b> ").concat(userData.lastname, "</p>\n            <p><b>E-Mail:</b> ").concat(userData.mail, "</p>\n                        <button class=\"btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle\" id=\"editUserModal\"\n                    onclick=\"editUserModal()\">\n                <span class=\"mx-2\">Bearbeiten</span>\n            </button>\n                            <button class=\"btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle\"\n                        onclick=\"deleteUser()\">\n                    <span class=\"mx-2\">Nutzer L\u00F6schen</span>\n                </button>\n                            <button class=\"btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle\" id=\"userLogout\"\n                    onclick=\"userLogout()\">\n                <span class=\"mx-2\">Logout</span>\n            </button>\n\n        ");
                     userProfileDiv.appendChild(userContainer);
                     userTableBody_1 = document.getElementById('userTableBody');
                     if (userTableBody_1) {
                         userTableBody_1.innerHTML = '';
                         userPets.forEach(function (pet) {
                             var petRow = document.createElement('tr');
-                            petRow.innerHTML = "\n                    <td>".concat(pet.name, "</td>\n                    <td>").concat(pet.kind, "</td>\n                ");
+                            petRow.innerHTML = "\n                    <td data-label=Name>".concat(pet.name, "</td>\n                    <td data-label=Tierart>").concat(pet.kind, "</td>\n                ");
                             userTableBody_1.appendChild(petRow);
                         });
                     }
@@ -190,11 +200,14 @@ function renderUserProfile() {
 renderUserProfile();
 function userLogout() {
     return __awaiter(this, void 0, void 0, function () {
-        var userProfile, response, error_5;
+        var userProfile, userTableBody, userProfileContainer, userLoginDiv, response, error_5;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     userProfile = document.getElementById('user-profile');
+                    userTableBody = document.getElementById('userTableBody');
+                    userProfileContainer = document.getElementById('user-profile-container');
+                    userLoginDiv = document.getElementById('register-login');
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
@@ -208,7 +221,11 @@ function userLogout() {
                 case 2:
                     response = _a.sent();
                     if (response.ok) {
+                        userProfileContainer.style.display = "none";
+                        userLoginDiv.style.display = "block";
                         userProfile.innerHTML = "";
+                        userTableBody.innerHTML = '';
+                        //window.location.reload(); //Könnte man nen Reload erzwingen für vollständiges Daten clearen
                         console.log('Abmeldung erfolgreich');
                     }
                     else {
@@ -224,7 +241,6 @@ function userLogout() {
         });
     });
 }
-// Beispiel für die Verwendung der Funktionen
 function fetchData() {
     return __awaiter(this, void 0, void 0, function () {
         var userProfile, userPets, error_6;
@@ -264,54 +280,6 @@ document.querySelector("#formLogin").addEventListener("submit", function (event)
     event.preventDefault();
     loginUser();
 });
-function generateRandomUser() {
-    var firstNames = ["John", "Emma", "Michael", "Sophia", "William", "Olivia"];
-    var lastNames = ["Smith", "Johnson", "Brown", "Williams", "Jones", "Garcia"];
-    var domains = ["gmail.com", "yahoo.com", "outlook.com", "example.com"];
-    var passwords = ["password123", "abc123", "qwerty", "letmein", "password"];
-    var randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    var randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    var randomDomain = domains[Math.floor(Math.random() * domains.length)];
-    var randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
-    var randomEmail = "".concat(randomFirstName.toLowerCase(), ".").concat(randomLastName.toLowerCase(), "@").concat(randomDomain);
-    return new UserObject(randomFirstName, randomLastName, randomEmail, randomPassword);
-}
-function addRandomUser() {
-    return __awaiter(this, void 0, void 0, function () {
-        var randomUser, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    randomUser = generateRandomUser();
-                    return [4 /*yield*/, fetch("/users", {
-                            method: "POST",
-                            body: JSON.stringify({
-                                firstname: randomUser.firstname,
-                                lastname: randomUser.lastname,
-                                mail: randomUser.mail,
-                                password: randomUser.password
-                            }),
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            credentials: "include"
-                        })];
-                case 1:
-                    response = _a.sent();
-                    if (!response.ok) return [3 /*break*/, 3];
-                    console.log("Random user added successfully!");
-                    return [4 /*yield*/, renderUserList()];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    console.error("Error adding random user:", response.statusText);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    });
-}
 // @ts-ignore
 function addUserPet() {
     return __awaiter(this, void 0, void 0, function () {
@@ -335,7 +303,7 @@ function addUserPet() {
                     response = _a.sent();
                     if (!response.ok) return [3 /*break*/, 4];
                     console.log("Tier erfolgreich hinzugefügt");
-                    return [4 /*yield*/, renderUserList()];
+                    return [4 /*yield*/, renderUserProfile()];
                 case 2:
                     _a.sent();
                     return [4 /*yield*/, renderUserPetListAdmin()];
@@ -370,7 +338,7 @@ function deleteUserPet(petId) {
                     return [4 /*yield*/, renderUserPetListAdmin()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, renderUserList()];
+                    return [4 /*yield*/, renderUserProfile()];
                 case 3:
                     _a.sent();
                     return [3 /*break*/, 5];
@@ -461,7 +429,7 @@ function addUser() {
                     lastNameInput.value = "";
                     emailInput.value = "";
                     passwordInput.value = "";
-                    return [4 /*yield*/, renderUserList()];
+                    return [4 /*yield*/, renderUserProfile()];
                 case 2:
                     _a.sent();
                     return [3 /*break*/, 4];
@@ -475,103 +443,6 @@ function addUser() {
     });
 }
 // @ts-ignore
-function renderUserList() {
-    return __awaiter(this, void 0, void 0, function () {
-        var tableBody, response, users, _loop_1, _i, users_1, user;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    tableBody = document.getElementById("userTableBody");
-                    return [4 /*yield*/, fetch("/users", {
-                            credentials: "include"
-                        })];
-                case 1:
-                    response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 7];
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    users = _a.sent();
-                    if (!tableBody) return [3 /*break*/, 6];
-                    tableBody.innerHTML = "";
-                    _loop_1 = function (user) {
-                        var userPets, row, emailCell, lastNameCell, firstNameCell, petCell, actionsCell, editButton, deleteButton, petButton;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0: return [4 /*yield*/, renderUserPetMain(user.id)];
-                                case 1:
-                                    userPets = _b.sent();
-                                    row = tableBody.insertRow();
-                                    emailCell = row.insertCell(0);
-                                    emailCell.textContent = user.mail;
-                                    emailCell.setAttribute("data-label", "E-Mail");
-                                    lastNameCell = row.insertCell(1);
-                                    lastNameCell.textContent = user.lastname;
-                                    lastNameCell.setAttribute("data-label", "Nachname");
-                                    firstNameCell = row.insertCell(2);
-                                    firstNameCell.textContent = user.firstname;
-                                    firstNameCell.setAttribute("data-label", "Vorname");
-                                    petCell = row.insertCell(3);
-                                    petCell.textContent = userPets.map(function (pet) { return pet.name; }).join(", ");
-                                    petCell.setAttribute("data-label", "Pets");
-                                    actionsCell = row.insertCell(4);
-                                    editButton = document.createElement("button");
-                                    editButton.className = "btn btn-warning m-3 bi bi-pen";
-                                    editButton.addEventListener("click", function () { return editUserCloud(user.id); });
-                                    console.log(user.id);
-                                    actionsCell.appendChild(editButton);
-                                    deleteButton = document.createElement("button");
-                                    deleteButton.className = "btn btn-danger m-3 bi bi-trash";
-                                    deleteButton.addEventListener("click", function () { return deleteUserCloud(user.id); });
-                                    actionsCell.appendChild(deleteButton);
-                                    petButton = document.createElement("button");
-                                    petButton.className = "btn btn-primary m-3 bi bi-gitlab";
-                                    petButton.addEventListener("click", function () { return petAdmin(user.id); });
-                                    actionsCell.appendChild(petButton);
-                                    return [2 /*return*/];
-                            }
-                        });
-                    };
-                    _i = 0, users_1 = users;
-                    _a.label = 3;
-                case 3:
-                    if (!(_i < users_1.length)) return [3 /*break*/, 6];
-                    user = users_1[_i];
-                    return [5 /*yield**/, _loop_1(user)];
-                case 4:
-                    _a.sent();
-                    _a.label = 5;
-                case 5:
-                    _i++;
-                    return [3 /*break*/, 3];
-                case 6: return [3 /*break*/, 8];
-                case 7:
-                    console.log("Error: Response is not OK", response.statusText);
-                    _a.label = 8;
-                case 8: return [2 /*return*/];
-            }
-        });
-    });
-}
-function renderUserPetMain(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        var responsePet, userPets;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("/users/".concat(id, "/pets"), {
-                        credentials: "include"
-                    })];
-                case 1:
-                    responsePet = _a.sent();
-                    if (!(responsePet === null || responsePet === void 0 ? void 0 : responsePet.ok)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, responsePet.json()];
-                case 2:
-                    userPets = _a.sent();
-                    return [2 /*return*/, userPets];
-                case 3: return [2 /*return*/, []]; // Falls keine Haustiere gefunden wurden, gib ein leeres Array zurück
-            }
-        });
-    });
-}
 function petAdmin() {
     var petFooterModal = document.getElementById("petModalFooter");
     if (petFooterModal) {
@@ -594,7 +465,7 @@ function petAdmin() {
 // @ts-ignore
 function renderUserPetListAdmin() {
     return __awaiter(this, void 0, void 0, function () {
-        var tableBody, userPets, _loop_2, _i, userPets_1, pet;
+        var tableBody, userPets, _loop_1, _i, userPets_1, pet;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -605,7 +476,7 @@ function renderUserPetListAdmin() {
                     if (userPets) {
                         if (tableBody) {
                             tableBody.innerHTML = "";
-                            _loop_2 = function (pet) {
+                            _loop_1 = function (pet) {
                                 var row = tableBody.insertRow();
                                 var emailCell = row.insertCell(0);
                                 emailCell.textContent = pet.name;
@@ -622,7 +493,7 @@ function renderUserPetListAdmin() {
                             };
                             for (_i = 0, userPets_1 = userPets; _i < userPets_1.length; _i++) {
                                 pet = userPets_1[_i];
-                                _loop_2(pet);
+                                _loop_1(pet);
                             }
                         }
                     }
@@ -725,7 +596,7 @@ function updateUser() {
                     editFirstName = editFirstNameInput.value.trim();
                     editLastName = editLastNameInput.value.trim();
                     editPassword = editPasswordInput.value.trim();
-                    if (!(editFirstName && editLastName && editPassword)) return [3 /*break*/, 6];
+                    if (!(editFirstName && editLastName)) return [3 /*break*/, 6];
                     return [4 /*yield*/, fetch("/user/update", {
                             method: "PATCH",
                             body: JSON.stringify({
@@ -813,40 +684,40 @@ async function updateUserCloud(id: string) {
 }
 */
 // @ts-ignore
-function deleteUserCloud(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        var result, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    result = window.confirm("Möchten Sie das Element wirklich löschen?");
-                    if (!result) return [3 /*break*/, 5];
-                    return [4 /*yield*/, fetch("/users/".concat(id), {
-                            method: "DELETE",
-                            credentials: "include"
-                        })];
-                case 1:
-                    response = _a.sent();
-                    if (!(response === null || response === void 0 ? void 0 : response.ok)) return [3 /*break*/, 3];
-                    return [4 /*yield*/, renderUserList()];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    console.log("Error: Response is not OK", response.statusText);
-                    _a.label = 4;
-                case 4:
-                    console.log("Nutzer Gelöscht!");
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
-            }
-        });
+document.addEventListener("DOMContentLoaded", function () {
+    var loginBtn = document.getElementById("loginBtn");
+    var registerBtn = document.getElementById("registerBtn");
+    var loginForm = document.getElementById("loginForm");
+    var registerForm = document.getElementById("registerForm");
+    loginBtn.addEventListener("click", function () {
+        loginForm.style.display = "block";
+        registerForm.style.display = "none";
     });
-}
+    registerBtn.addEventListener("click", function () {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+    });
+});
 function scrollDown() {
     //this.scroller.scrollToAnchor("targetGreen");
     document.getElementById("userList").scrollIntoView({
         behavior: "smooth",
         block: "start",
     });
+}
+function greetUser(userName) {
+    var greetings = [
+        "Hallo, ".concat(userName, "!"),
+        "Guten Tag, ".concat(userName, "!"),
+        "Hi, ".concat(userName, "!"),
+        "Willkommen, ".concat(userName, "!"),
+        "Gr\u00FC\u00DF dich, ".concat(userName, "!"),
+        "Servus, ".concat(userName, "!"),
+        "Moin, ".concat(userName, "!"),
+        "Hey, ".concat(userName, "!"),
+        "Sch\u00F6n dich zu sehen, ".concat(userName, "!"),
+        "Herzlich willkommen, ".concat(userName, "!")
+    ];
+    var randomIndex = Math.floor(Math.random() * greetings.length);
+    return greetings[randomIndex];
 }

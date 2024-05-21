@@ -14,88 +14,80 @@
     <div class="container">
         <header class="d-block d-md-flex justify-content-around justify-content-md-between py-5 my-5">
             <h1 class="text-white text-center" id="pageHeadline">User Manager</h1>
-            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="randomBtn"
-                    onclick="addRandomUser()">
-                <span class="mx-2">Zufällige Nutzer</span>
-            </button>
-            <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="UserdataRender"
-                    onclick="renderUserList()">
-                <span class="mx-2">Get API Data</span>
-            </button>
             <button class="btn btn-primary my-3 p-3 bi bi-tornado btn-sparkle" id="Userdata"
                     onclick="fetchData()">
-                <span class="mx-2">Login Data</span>
-            </button>
-            <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="userLogout"
-                    onclick="userLogout()">
-                <span class="mx-2">Logout</span>
-            </button>
-            <button class="btn btn-danger my-3 p-3 bi bi-tornado btn-sparkle" id="editUserModal"
-                    onclick="editUserModal()">
-                <span class="mx-2">Bearbeiten</span>
+                <span class="mx-2">Fetch Data</span>
             </button>
 
 
         </header>
 
-
-        <div class="row">
-            <div class="col">
-                <div class="create mb-5">
-                    <h2 class="w-100 text-center text-white py-3">Nutzer Erstellen</h2>
-                    <form id="formCreate">
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="email" placeholder="name@example.com" required type="email">
-                            <label for="email">E-Mail Adresse</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="firstName" placeholder="Vorname" required type="text">
-                            <label for="firstName">Vorname</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="lastName" placeholder="Nachname" required type="text">
-                            <label for="lastName">Nachname</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="password" placeholder="Passwort" required type="password">
-                            <label for="password">Passwort</label>
-                        </div>
-
-                        <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
-                            <span class="mx-2">Nutzer anlegen</span>
-                        </button>
-                    </form>
+        <div class="container mt-5" id="register-login">
+            <div class="row">
+                <div class="col">
+                    <div class="btn-group" role="group">
+                        <button id="loginBtn" type="button" class="btn btn-primary">Login</button>
+                        <button id="registerBtn" type="button" class="btn btn-primary">Register</button>
+                    </div>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="login mb-5" id="loginForm">
+                        <h2 class="w-100 text-center text-white py-3">Einloggen</h2>
+                        <form id="formLogin">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="emailLogin" placeholder="name@example.com" required
+                                       type="email">
+                                <label for="emailLogin">E-Mail Adresse</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="passwordLogin" placeholder="Passwort" required
+                                       type="password">
+                                <label for="passwordLogin">Passwort</label>
+                            </div>
 
-            <div class="col">
-                <div class="login mb-5">
-                    <h2 class="w-100 text-center text-white py-3">Einloggen</h2>
-                    <form id="formLogin">
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="emailLogin" placeholder="name@example.com" required
-                                   type="email">
-                            <label for="emailLogin">E-Mail Adresse</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="passwordLogin" placeholder="Passwort" required
-                                   type="password">
-                            <label for="passwordLogin">Passwort</label>
-                        </div>
+                            <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
+                                <span class="mx-2">Einloggen</span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="create mb-5" id="registerForm" style="display: none;">
+                        <h2 class="w-100 text-center text-white py-3">Nutzer Erstellen</h2>
+                        <form id="formCreate">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="email" placeholder="name@example.com" required type="email">
+                                <label for="email">E-Mail Adresse</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="firstName" placeholder="Vorname" required type="text">
+                                <label for="firstName">Vorname</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="lastName" placeholder="Nachname" required type="text">
+                                <label for="lastName">Nachname</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="password" placeholder="Passwort" required type="password">
+                                <label for="password">Passwort</label>
+                            </div>
 
-                        <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
-                            <span class="mx-2">Einloggen</span>
-                        </button>
-                    </form>
+                            <button class="btn btn-primary my-3 bi bi-person-add p-3" type="submit">
+                                <span class="mx-2">Nutzer anlegen</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="user-profile w-100 bg-white border rounded rounded-3 p-5">
+
+
+        <div class="user-profile w-100 bg-white border rounded rounded-3 p-5 bg-opacity-07" id="user-profile-container" style="display: none">
             <div class="user-profile-data" id="user-profile"></div>
             <div class="display-user-pets" id="userPetList">
-                <h2 class="w-100 text-center text-white py-3">User Tiere</h2>
-                <button class="btn btn-danger my-3 p-3 bi bi-gitlab btn-sparkle"
+                <h3 class="w-100 text-center mt-4">Deine Tiere</h3>
+                <button class="btn btn-danger my-5 p-3 bi bi-gitlab btn-sparkle"
                         onclick="petAdmin()">
                     <span class="mx-2">Tiere verwalten</span>
                 </button>
