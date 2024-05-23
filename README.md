@@ -13,6 +13,8 @@ npm install
 
 Die IDs werden nun vom Server über das UUID Packe UUID für die einzelnen Nutzer erstellt, da durch ein einzelnes Hochzählen der Useranzahl im Array sich IDs doppeln können, wenn zwischendurch auch wieder nutzer gelöscht werden udn dann weitere hinzugefügt werden. Das wird durch das nutzen der UUIDs veränder.
 
+Die Logindaten für die Datenbank werden in einer ENV gespeichert, damit die Daten nicht in Git landen. Daher wird auch das dotenv Package geladen und benutz.
+
 Das hat allerdings zur Folge, dass einige Funktionen umgebaut werden mussten, da die IDs nun keine Numbers sondern Strings sind.
 
 Die severhttp-test.http sollte alle notwendigen Test für die Crud und Crd funktionen enthalten udn wurde auf die erstellten User Demodaten angepasst.

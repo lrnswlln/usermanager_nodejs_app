@@ -22,7 +22,7 @@ app.use(express.urlencoded({extended: false}));
 
 
 
-//Session mit ID erweitern
+//Session mit ID
 declare module 'express-session' {
     interface SessionData {
         userId: string;
@@ -55,7 +55,7 @@ async function checkDatabaseConnection() {
         console.log("Die Verbindung zur Datenbank wurde erfolgreich hergestellt.");
     } catch (error) {
         console.error("Fehler beim Herstellen der Verbindung zur Datenbank:", error);
-        process.exit(1); // Beende den Prozess bei Verbindungs fehlschlägen
+        process.exit(1); // Beendet den Prozess bei Verbindungs fehlschlägen
     }
 }
 
@@ -72,7 +72,7 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
 
 
 
-// POST Login
+//Login/Logout
 app.post('/login', async (req: express.Request, res: express.Response) => {
     try {
         const { mail, password } = req.body;
@@ -104,29 +104,6 @@ app.post('/login', async (req: express.Request, res: express.Response) => {
     }
 });
 
-
-app.get('/user/profile', requireAuth, async (req: express.Request, res: express.Response) => {
-    try {
-        const userId: string = req.session.userId;
-
-        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/user/pets', requireAuth, async (req: express.Request, res: express.Response) => {
-    try {
-        const userId: string = req.session.userId;
-
-        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
-        res.status(200).json(userPets);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 app.post('/logout', async (req: express.Request, res: express.Response) => {
     try {
         req.session.destroy((err: any) => {
@@ -142,26 +119,19 @@ app.post('/logout', async (req: express.Request, res: express.Response) => {
     }
 });
 
-app.delete('/user/delete', requireAuth, async (req: express.Request, res: express.Response) => {
+
+//User
+app.get('/user/profile', requireAuth, async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.session.userId;
-        await (await connection).execute('DELETE FROM Pets WHERE userId = ?', [userId]);
-        await (await connection).execute('DELETE FROM Users WHERE id = ?', [userId]);
-        req.session.destroy((err: any) => {
-            if (err) {
-                res.status(500).json({ error: "Beim Löschen des Benutzers ist ein Fehler aufgetreten." });
-                return;
-            }
-            res.clearCookie('sessionID');
-            res.status(200).json({ message: "Benutzer wurde gelöscht und abgemeldet" });
-        });
+
+        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
+        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-
-// POST User
 app.post('/users', async (req: express.Request, res: express.Response) => {
     try {
         const {firstname, lastname, mail, password} = req.body;
@@ -180,38 +150,14 @@ app.post('/users', async (req: express.Request, res: express.Response) => {
         const id = uuidv4();
         await (await connection).query('INSERT INTO Users (id, firstname, lastname, mail, password) VALUES (?, ?, ?, ?, ?)', [id, firstname, lastname, mail, password]);
 
+        req.session.userId = id;
+
         const newUser = {id, firstname, lastname, mail, password};
         res.status(201).json(newUser);
     } catch (error) {
         res.status(500).json({error: error.message});
     }
 });
-
-// GET Users
-app.get('/users', async (req: express.Request, res: express.Response) => {
-    try {
-        const [users] = await (await connection).execute('SELECT * FROM Users');
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-});
-
-//Get USer
-app.get('/users/:userId', async (req: express.Request, res: express.Response) => {
-    try {
-        const userId: string = req.params.userId;
-        const [user]: any[] = await (await connection).query('SELECT * FROM Users WHERE id = ?', [userId]);
-        if (user && user.length > 0) {
-            res.status(200).json(user[0]);
-        } else {
-            res.status(404).json({message: 'Benutzer nicht gefunden'});
-        }
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
-});
-
 
 app.patch('/user/update', requireAuth, async (req: express.Request, res: express.Response) => {
     try {
@@ -260,6 +206,26 @@ app.patch('/user/update', requireAuth, async (req: express.Request, res: express
     }
 });
 
+app.delete('/user/delete', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+        await (await connection).execute('DELETE FROM Pets WHERE userId = ?', [userId]);
+        await (await connection).execute('DELETE FROM Users WHERE id = ?', [userId]);
+        req.session.destroy((err: any) => {
+            if (err) {
+                res.status(500).json({ error: "Beim Löschen des Benutzers ist ein Fehler aufgetreten." });
+                return;
+            }
+            res.clearCookie('sessionID');
+            res.status(200).json({ message: "Benutzer wurde gelöscht und abgemeldet" });
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+//Pets
 
 app.post('/user/pets', requireAuth, async (req: express.Request, res: express.Response) => {
     try {
@@ -294,6 +260,17 @@ app.post('/user/pets', requireAuth, async (req: express.Request, res: express.Re
     }
 });
 
+app.get('/user/pets', requireAuth, async (req: express.Request, res: express.Response) => {
+    try {
+        const userId: string = req.session.userId;
+
+        const [userPets]: any[] = await (await connection).query('SELECT * FROM Pets WHERE userId = ?', [userId]);
+        res.status(200).json(userPets);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.delete('/user/pets/:petId', requireAuth, async (req: express.Request, res: express.Response) => {
     try {
         const userId: string = req.session.userId;
@@ -311,7 +288,6 @@ app.delete('/user/pets/:petId', requireAuth, async (req: express.Request, res: e
         res.status(500).json({ error: error.message });
     }
 });
-
 
 
 app.use(notFound);
